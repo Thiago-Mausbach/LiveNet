@@ -1,0 +1,6 @@
+@LiveNet.Server_HostAddress = http://localhost:5259
+
+GET {{LiveNet.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
