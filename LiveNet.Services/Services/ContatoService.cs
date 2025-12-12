@@ -18,9 +18,7 @@ public class ContatoService : IContatoService
 
     public async Task<List<ContatoViewModel>> BuscarContatosAsync()
     {
-        var teste = await _context.Contato.ToListAsync();
-        return teste.ToContatoDto();
-
+        return await _context.Contato.Select(c => c.ToContatoDto()).ToListAsync();
     }
     public async Task CriarContatosListaAsync(Stream stream, string nome)
     {

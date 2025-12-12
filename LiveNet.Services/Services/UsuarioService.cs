@@ -1,5 +1,7 @@
 ﻿using LiveNet.Database.Context;
+using LiveNet.Domain.Mapping;
 using LiveNet.Domain.Models;
+using LiveNet.Domain.ViewModels;
 using LiveNet.Infrastructure;
 using LiveNet.Services.Interfaces;
 using System.Data.Entity;
@@ -11,10 +13,9 @@ public class UsuarioService : IUsuarioService
 
     private readonly ApplicationDbContext _context;
 
-    public async Task<List<UsuarioModel>> BuscarUsuariosAsync()
+    public async Task<List<UsuarioViewModel>> BuscarUsuariosAsync()
     {
-        var teste = await _context.Usuario.ToListAsync();
-        return teste.ToUsuarioDto();
+        return await _context.Usuario.Select(u => u.ToUsuarioDto()).ToListAsync();
     }
 
     public async Task CriarUsuarioAsync(UsuarioModel usuario)
