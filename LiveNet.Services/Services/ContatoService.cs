@@ -4,6 +4,7 @@ using LiveNet.Database.Mappers;
 using LiveNet.Domain.Models;
 using LiveNet.Infrastructure;
 using LiveNet.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using System.Data.Entity;
 using System.Globalization;
 
@@ -14,26 +15,35 @@ public class ContatoService : IContatoService
     private readonly ApplicationDbContext _context;
     private readonly UsuarioAtualService _usuarioAtualService;
 
+    public ContatoService(ApplicationDbContext context,
+        UsuarioAtualService usuarioAtualService)
+    {
+        _context = context;
+        _usuarioAtualService = usuarioAtualService;
+    }
+
     public async Task<List<ContatoModel>> BuscarContatosAsync()
     {
         var teste = await _context.Contato.ToListAsync();
         return teste;
     }
-    public async Task CriarContatosListaAsync(Stream stream, string nome)
-    {
 
+    public async Task UploadListaAsync(IFormFile file, string nome)
+    {
+        using var stream = file.OpenReadStream();
         using var reader = new StreamReader(stream);
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-
+        await SaveFileAsync(file);
         csv.Context.RegisterClassMap<ContatoMapper>();
         var contatos = csv.GetRecords<ContatoModel>().ToList();
 
         foreach (var contato in contatos)
         {
-            //TODO validação, regras de negócio, persistência
             contato.ModoInclusao = nome;
             await _context.AddAsync(contato);
         }
+
+        await _context.SaveChangesAsync();
     }
 
     public async Task CriarContatoManualAsync(ContatoModel contato)
@@ -68,5 +78,19 @@ public class ContatoService : IContatoService
         }
         else
             return 0;
+    }
+
+    private async Task SaveFileAsync(IFormFile file)
+    {
+        var pasta = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+        Directory.CreateDirectory(pasta);
+
+        var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+        var filePath = Path.Combine(pasta, fileName);
+
+        using (var fileStream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(fileStream);
+        }
     }
 }

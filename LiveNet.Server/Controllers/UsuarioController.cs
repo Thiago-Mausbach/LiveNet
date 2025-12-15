@@ -41,7 +41,7 @@ public class UsuarioController : ControllerBase
     }
 
     [HttpPatch("{id}", Name = "AtualizarUsuario")]
-    public async Task<ActionResult> PatchAsync(UsuarioModel usuario)
+    public async Task<ActionResult> PatchAsync(UsuarioModel usuario, int id)
     {
         var retorno = await _service.EditarUsuarioAsync(usuario);
         if (retorno != null)

@@ -34,8 +34,8 @@ public class ContatoController : ControllerBase
         if (file == null || file.Length == 0)
             return BadRequest("Arquivo inválido");
 
-        using var stream = file.OpenReadStream();
-        await _service.CriarContatosListaAsync(stream, file.FileName);
+
+        await _service.UploadListaAsync(file, file.FileName);
 
         return Ok("Importação concluída");
 

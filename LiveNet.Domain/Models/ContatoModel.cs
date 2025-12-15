@@ -13,6 +13,7 @@ public class ContatoModel : IAuditColumns, ISoftDelete
     public string? Empresa { get; set; }
     public string? CnpjEmpresa { get; set; }
     public string? Cargo { get; set; }
+    public bool Cliente { get; set; }
     public List<ServicoModel>? Servicos { get; set; }
     public List<string>? Interesses { get; set; }
     public string? ModoInclusao { get; set; }
