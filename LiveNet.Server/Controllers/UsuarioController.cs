@@ -1,6 +1,9 @@
-﻿using LiveNet.Domain.Models;
+﻿using LiveNet.Domain.Mapping;
+using LiveNet.Domain.Models;
+using LiveNet.Domain.ViewModels;
 using LiveNet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Shared;
 
 namespace LiveNet.Api.Controllers;
 
@@ -18,13 +21,13 @@ public class UsuarioController : ControllerBase
     }
 
     [HttpGet(Name = "BuscarUsuario")]
-    public async Task<ActionResult<IEnumerable<UsuarioModel>>> GetAsync()
+    public async Task<ActionResult<IEnumerable<UsuarioViewModel>>> GetAsync()
     {
         var usuarios = await _service.BuscarUsuariosAsync();
-        if (usuarios == null || usuarios.Count == 0)
+        if (usuarios.IsNullOrEmpty())
+            return usuarios.Select(u => u.ToUsuarioDto()).ToList();
+        else
             return NotFound("Nenhum usuário");
-
-        return Ok(usuarios);
     }
 
     [HttpPost(Name = "CriarUsuario")]

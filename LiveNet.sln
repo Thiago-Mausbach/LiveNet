@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveNet.Domain", "LiveNet.D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveNet.Infrastructure", "LiveNet.Infrastructure\LiveNet.Infrastructure.csproj", "{960CFA17-0F69-4543-8E6D-63A08EDF3F51}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{005660AA-6C04-4AB3-9D42-B9B1A67E25BA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{960CFA17-0F69-4543-8E6D-63A08EDF3F51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{960CFA17-0F69-4543-8E6D-63A08EDF3F51}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{960CFA17-0F69-4543-8E6D-63A08EDF3F51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{005660AA-6C04-4AB3-9D42-B9B1A67E25BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{005660AA-6C04-4AB3-9D42-B9B1A67E25BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{005660AA-6C04-4AB3-9D42-B9B1A67E25BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{005660AA-6C04-4AB3-9D42-B9B1A67E25BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

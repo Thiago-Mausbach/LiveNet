@@ -1,7 +1,9 @@
-﻿using LiveNet.Domain.Models;
+﻿using LiveNet.Domain.Mapping;
+using LiveNet.Domain.Models;
 using LiveNet.Domain.ViewModels;
 using LiveNet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Shared;
 
 namespace LiveNet.Api.Controllers;
 
@@ -20,8 +22,8 @@ public class ContatoController : ControllerBase
     public async Task<ActionResult<IEnumerable<ContatoViewModel>>> GetAsync()
     {
         var contatos = await _service.BuscarContatosAsync();
-        if (contatos == null || contatos.Count == 0)
-            return Ok();
+        if (!contatos.IsNullOrEmpty())
+            return contatos.Select(c => c.ToContatoDto()).ToList();
         else
             return BadRequest();
     }

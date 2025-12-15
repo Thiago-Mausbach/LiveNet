@@ -1,6 +1,9 @@
-﻿using LiveNet.Domain.Models;
+﻿using LiveNet.Domain.Mapping;
+using LiveNet.Domain.Models;
+using LiveNet.Domain.ViewModels;
 using LiveNet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Shared;
 
 namespace LiveNet.Api.Controllers;
 
@@ -19,13 +22,13 @@ public class ServicoController : ControllerBase
     }
 
     [HttpGet(Name = "BuscarServico")]
-    public async Task<ActionResult<IEnumerable<ServicoModel>>> GetAsync()
+    public async Task<ActionResult<IEnumerable<ServicoViewModel>>> GetAsync()
     {
         var servicos = await _service.BuscarServicosAsync();
-        if (servicos == null || servicos.Count == 0)
-            return NotFound();
+        if (!servicos.IsNullOrEmpty())
+            return servicos.Select(s => s.ToServicoDto()).ToList();
         else
-            return Ok(servicos);
+            return NotFound();
     }
 
     [HttpPost(Name = "CriarServico")]

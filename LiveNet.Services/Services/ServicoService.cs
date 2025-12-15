@@ -1,7 +1,5 @@
 ﻿using LiveNet.Database.Context;
-using LiveNet.Domain.Mapping;
 using LiveNet.Domain.Models;
-using LiveNet.Domain.ViewModels;
 using LiveNet.Infrastructure;
 using LiveNet.Services.Interfaces;
 using System.Data.Entity;
@@ -14,9 +12,9 @@ internal class ServicoService : IServicoService
     private readonly UsuarioAtualService _usuarioAtualService;
 
 
-    public async Task<List<ServicoViewModel>> BuscarServicosAsync()
+    public async Task<List<ServicoModel>> BuscarServicosAsync()
     {
-        return await _context.Servico.Select(s => s.ToServicoDto()).ToListAsync();
+        return await _context.Servico.ToListAsync();
     }
 
     public async Task CriarServicoAsync(ServicoModel servico)

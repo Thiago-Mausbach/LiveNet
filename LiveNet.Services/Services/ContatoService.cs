@@ -1,9 +1,7 @@
 ﻿using CsvHelper;
 using LiveNet.Database.Context;
 using LiveNet.Database.Mappers;
-using LiveNet.Domain.Mapping;
 using LiveNet.Domain.Models;
-using LiveNet.Domain.ViewModels;
 using LiveNet.Infrastructure;
 using LiveNet.Services.Interfaces;
 using System.Data.Entity;
@@ -16,9 +14,10 @@ public class ContatoService : IContatoService
     private readonly ApplicationDbContext _context;
     private readonly UsuarioAtualService _usuarioAtualService;
 
-    public async Task<List<ContatoViewModel>> BuscarContatosAsync()
+    public async Task<List<ContatoModel>> BuscarContatosAsync()
     {
-        return await _context.Contato.Select(c => c.ToContatoDto()).ToListAsync();
+        var teste = await _context.Contato.ToListAsync();
+        return teste;
     }
     public async Task CriarContatosListaAsync(Stream stream, string nome)
     {
