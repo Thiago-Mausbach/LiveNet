@@ -14,11 +14,13 @@ public static class ServiceRegistration
         //services.AddDbContext<AppDbContext>(options =>
         //options.UseInMemoryDatabase(("DefaultConnection")));
 
-        services.AddScoped<IContatoService, ContatoService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IContatoService, ContatoService>();
+        services.AddScoped<IEmpresaService, EmpresaService>();
+        services.AddScoped<IFavoritoService, FavoritoService>();
         services.AddScoped<IServicoService, ServicoService>();
-        services.AddScoped<IUsuarioService, UsuarioService>();
         services.AddScoped<IUsuarioAtualService, UsuarioAtualService>();
+        services.AddScoped<IUsuarioService, UsuarioService>();
 
         services.AddHttpContextAccessor();
 

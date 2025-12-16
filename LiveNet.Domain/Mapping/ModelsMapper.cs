@@ -11,7 +11,7 @@ public static class ModelsMapper
         {
             Nome = value.Nome,
             EmailPessoal = value.EmailPessoal,
-            Empresa = value.Empresa,
+            Empresa = value.NomeEmpresa,
             EmailEmpresa = value.EmailEmpresa,
             Cargo = value.Cargo,
             Telefone = value.Telefone,
@@ -19,7 +19,8 @@ public static class ModelsMapper
             ModoInclusao = value.ModoInclusao,
             Servicos = value.Servicos.Select(s => new ServicoViewModel
             {
-                Servico = s.Servico
+                Id = s.Servico.Id,
+                Servico = s.Servico.Servico
             }).ToList()
         };
         return result;
