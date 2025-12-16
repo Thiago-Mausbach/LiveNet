@@ -10,25 +10,19 @@ using System.Globalization;
 
 namespace LiveNet.Services.Services;
 
-public class ContatoService : IContatoService
+public class ContatoService(ApplicationDbContext context,
+    UsuarioAtualService usuarioAtualService) : IContatoService
 {
-    private readonly ApplicationDbContext _context;
-    private readonly UsuarioAtualService _usuarioAtualService;
-
-    public ContatoService(ApplicationDbContext context,
-        UsuarioAtualService usuarioAtualService)
-    {
-        _context = context;
-        _usuarioAtualService = usuarioAtualService;
-    }
+    private readonly ApplicationDbContext _context = context;
+    private readonly UsuarioAtualService _usuarioAtualService = usuarioAtualService;
 
     public async Task<List<ContatoModel>> BuscarContatosAsync()
     {
-        var teste = await _context.Contato.ToListAsync();
-        return teste;
+        var ret = await _context.Contato.ToListAsync();
+        return ret;
     }
 
-    public async Task UploadListaAsync(IFormFile file, string nome)
+    public async Task<bool> UploadListaAsync(IFormFile file, string nome)
     {
         using var stream = file.OpenReadStream();
         using var reader = new StreamReader(stream);
@@ -39,34 +33,46 @@ public class ContatoService : IContatoService
 
         foreach (var contato in contatos)
         {
-            contato.ModoInclusao = nome;
-            await _context.AddAsync(contato);
+            var filtro = _context.Contato.FirstOrDefaultAsync(predicate: f => f.EmailEmpresa == contato.EmailEmpresa || f.EmailPessoal == contato.EmailPessoal);
+            if (filtro == null)
+            {
+                contato.ModoInclusao = nome;
+                await _context.AddAsync(contato);
+            }
+            else { /*criar uma lista com os contatos não adicionados e apresentar no front*/}
         }
 
         await _context.SaveChangesAsync();
+        return true;
     }
 
-    public async Task CriarContatoManualAsync(ContatoModel contato)
+    public async Task<bool> CriarContatoManualAsync(ContatoModel contato)
     {
-        _context.Contato.Add(contato);
-        contato.ModoInclusao = "Manual";
-        await _context.SaveChangesAsync();
+        var filtro = _context.Contato.FirstOrDefaultAsync(predicate: f => f.EmailEmpresa == contato.EmailEmpresa || f.EmailPessoal == contato.EmailPessoal);
+        if (filtro == null)
+        {
+            _context.Contato.Add(contato);
+            contato.ModoInclusao = "Manual";
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        else return false;
     }
 
-    public async Task<ContatoModel> AtualizarContatoAsync(int id, ContatoModel contato)
+    public async Task<bool> AtualizarContatoAsync(Guid id, ContatoModel contato)
     {
         var original = await _context.Contato.FindAsync(id);
-        if (original == null) return original;
+        if (original == null) return false;
 
         EntityDiffValidate.ValidarDif(original, contato);
 
         original.UpdatedAt = DateTimeOffset.Now;
         original.UpdatedBy = _usuarioAtualService.UsuarioId;
         await _context.SaveChangesAsync();
-        return original;
+        return true;
     }
 
-    public async Task<int> ExcluirContatoAsync(int id)
+    public async Task<bool> ExcluirContatoAsync(int id)
     {
         var contatoExcluido = await _context.Contato.FindAsync(id);
         if (contatoExcluido != null)
@@ -74,23 +80,21 @@ public class ContatoService : IContatoService
             contatoExcluido.IsDeleted = true;
             contatoExcluido.DeletedBy = _usuarioAtualService.UsuarioId;
             await _context.SaveChangesAsync();
-            return 1;
+            return true;
         }
         else
-            return 0;
+            return false;
     }
 
-    private async Task SaveFileAsync(IFormFile file)
+    private static async Task SaveFileAsync(IFormFile file)
     {
         var pasta = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
         Directory.CreateDirectory(pasta);
 
-        var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+        var fileName = $"/{file.FileName}";
         var filePath = Path.Combine(pasta, fileName);
 
-        using (var fileStream = new FileStream(filePath, FileMode.Create))
-        {
-            await file.CopyToAsync(fileStream);
-        }
+        using var fileStream = new FileStream(filePath, FileMode.Create);
+        await file.CopyToAsync(fileStream);
     }
 }

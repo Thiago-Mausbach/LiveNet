@@ -1,6 +1,6 @@
 ﻿using LiveNet.Database.Context;
+using LiveNet.Domain;
 using LiveNet.Domain.Models;
-using LiveNet.Domain.ViewModels;
 using LiveNet.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -12,17 +12,11 @@ using System.Text;
 
 namespace LiveNet.Services.Services;
 
-public class AuthService : IAuthService
+public class AuthService(ApplicationDbContext context, IConfiguration configuration) : IAuthService
 {
-    private readonly ApplicationDbContext _context;
-    private readonly IConfiguration _configuration;
+    private readonly ApplicationDbContext _context = context;
+    private readonly IConfiguration _configuration = configuration;
     private readonly PasswordHasher<UsuarioModel> _passwordHasher = new();
-
-    public AuthService(ApplicationDbContext context, IConfiguration configuration)
-    {
-        _context = context;
-        _configuration = configuration;
-    }
 
     public async Task<AuthResult> LoginAsync(LoginViewModel model)
     {

@@ -1,4 +1,4 @@
-﻿namespace LiveNet.Domain.ViewModels;
+﻿namespace LiveNet.Domain;
 
 public class LoginViewModel
 {

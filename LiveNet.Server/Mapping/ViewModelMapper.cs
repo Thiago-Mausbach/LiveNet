@@ -1,9 +1,9 @@
-﻿using LiveNet.Domain.Models;
-using LiveNet.Domain.ViewModels;
+﻿using LiveNet.Api.ViewModels;
+using LiveNet.Domain.Models;
 
-namespace LiveNet.Domain.Mapping;
+namespace LiveNet.Api.Mapping;
 
-public static class ModelsMapper
+public static class ViewModelMapper
 {
     public static ContatoViewModel ToContatoDto(this ContatoModel value)
     {
@@ -11,7 +11,7 @@ public static class ModelsMapper
         {
             Nome = value.Nome,
             EmailPessoal = value.EmailPessoal,
-            Empresa = value.NomeEmpresa,
+            Empresa = value.Empresa.RazaoSocial,
             EmailEmpresa = value.EmailEmpresa,
             Cargo = value.Cargo,
             Telefone = value.Telefone,
@@ -43,6 +43,18 @@ public static class ModelsMapper
             Id = value.Id,
             Nome = value.Nome,
             Email = value.Email,
+            Senha = value.Senha
+        };
+        return result;
+    }
+
+    public static EmpresaViewModel ToEmpresaDto(this EmpresaModel value)
+    {
+        var result = new EmpresaViewModel
+        {
+            Id = value.Id,
+            RazaoSocial = value.RazaoSocial,
+            Cnpj = value.Cnpj,
         };
         return result;
     }

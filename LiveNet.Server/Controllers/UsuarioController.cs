@@ -1,6 +1,6 @@
-﻿using LiveNet.Domain.Mapping;
+﻿using LiveNet.Api.Mapping;
+using LiveNet.Api.ViewModels;
 using LiveNet.Domain.Models;
-using LiveNet.Domain.ViewModels;
 using LiveNet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
@@ -10,15 +10,10 @@ namespace LiveNet.Api.Controllers;
 [ApiController]
 [Route("Api/[Controller]")]
 
-public class UsuarioController : ControllerBase
+public class UsuarioController(IUsuarioService service) : ControllerBase
 {
 
-    private readonly IUsuarioService _service;
-
-    public UsuarioController(IUsuarioService service)
-    {
-        _service = service;
-    }
+    private readonly IUsuarioService _service = service;
 
     [HttpGet(Name = "BuscarUsuario")]
     public async Task<ActionResult<IEnumerable<UsuarioViewModel>>> GetAsync()
@@ -33,19 +28,26 @@ public class UsuarioController : ControllerBase
     [HttpPost(Name = "CriarUsuario")]
     public async Task<ActionResult> PostAsync(UsuarioModel usuario)
     {
-        if (usuario == null)
+        if (ModelState.IsValid)
+        {
+            await _service.CriarUsuarioAsync(usuario);
+            return Created();
+        }
+        else
             return BadRequest();
-
-        await _service.CriarUsuarioAsync(usuario);
-        return Created();
     }
-
     [HttpPatch("{id}", Name = "AtualizarUsuario")]
-    public async Task<ActionResult> PatchAsync(UsuarioModel usuario, int id)
+    public async Task<ActionResult> PatchAsync(UsuarioViewModel usuario, int id)
     {
-        var retorno = await _service.EditarUsuarioAsync(usuario);
-        if (retorno != null)
-            return Ok();
+        if (ModelState.IsValid)
+        {
+            var model = UsuarioMapper.ToUsuarioModel(usuario);
+            var retorno = await _service.EditarUsuarioAsync(model);
+            if (retorno)
+                return Ok();
+            else
+                return BadRequest();
+        }
         else
             return BadRequest();
     }
@@ -54,7 +56,7 @@ public class UsuarioController : ControllerBase
     public async Task<ActionResult> DeleteAsync(Guid id)
     {
         var retorno = await _service.DeletarUsuariosAsync(id);
-        if (retorno == 1)
+        if (retorno)
             return Ok();
         else
             return BadRequest();

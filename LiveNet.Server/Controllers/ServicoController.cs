@@ -1,6 +1,5 @@
-﻿using LiveNet.Domain.Mapping;
-using LiveNet.Domain.Models;
-using LiveNet.Domain.ViewModels;
+﻿using LiveNet.Api.Mapping;
+using LiveNet.Api.ViewModels;
 using LiveNet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
@@ -11,15 +10,10 @@ namespace LiveNet.Api.Controllers;
 [ApiController]
 [Route("Api/[Controller]")]
 
-public class ServicoController : ControllerBase
+public class ServicoController(IServicoService service) : ControllerBase
 {
 
-    private readonly IServicoService _service;
-
-    public ServicoController(IServicoService service)
-    {
-        _service = service;
-    }
+    private readonly IServicoService _service = service;
 
     [HttpGet(Name = "BuscarServico")]
     public async Task<ActionResult<IEnumerable<ServicoViewModel>>> GetAsync()
@@ -32,20 +26,22 @@ public class ServicoController : ControllerBase
     }
 
     [HttpPost(Name = "CriarServico")]
-    public async Task<ActionResult> PostAsync(ServicoModel servico)
+    public async Task<ActionResult> PostAsync(ServicoViewModel servico)
     {
         if (servico == null)
             return BadRequest();
 
-        await _service.CriarServicoAsync(servico);
+        var model = ServicoMapper.ToServicoModel(servico);
+        await _service.CriarServicoAsync(model);
         return Created();
     }
 
     [HttpPatch("{id}", Name = "AtualizarServico")]
-    public async Task<ActionResult> PatchAsync(ServicoModel servico)
+    public async Task<ActionResult> PatchAsync(ServicoViewModel servico)
     {
-        var retorno = await _service.AtualizarServicoAsync(servico);
-        if (retorno != null)
+        var model = ServicoMapper.ToServicoModel(servico);
+        var retorno = await _service.AtualizarServicoAsync(model);
+        if (retorno)
             return Ok();
         else
             return BadRequest();
@@ -55,7 +51,7 @@ public class ServicoController : ControllerBase
     public async Task<ActionResult> DeleteAsync(int id)
     {
         var retorno = await _service.DeletarServicoAsync(id);
-        if (retorno == 1)
+        if (retorno)
             return Ok();
 
         return BadRequest();

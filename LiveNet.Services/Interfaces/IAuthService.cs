@@ -1,4 +1,4 @@
-﻿using LiveNet.Domain.ViewModels;
+﻿using LiveNet.Domain;
 
 namespace LiveNet.Services.Interfaces
 {

@@ -6,6 +6,6 @@ public interface IUsuarioService
 {
     Task<List<UsuarioModel>> BuscarUsuariosAsync();
     Task CriarUsuarioAsync(UsuarioModel usuario);
-    Task<UsuarioModel> EditarUsuarioAsync(UsuarioModel usuario);
-    Task<int> DeletarUsuariosAsync(Guid id);
+    Task<bool> EditarUsuarioAsync(UsuarioModel usuario);
+    Task<bool> DeletarUsuariosAsync(Guid id);
 }

@@ -1,6 +1,5 @@
-﻿using LiveNet.Domain.Mapping;
-using LiveNet.Domain.Models;
-using LiveNet.Domain.ViewModels;
+﻿using LiveNet.Api.Mapping;
+using LiveNet.Api.ViewModels;
 using LiveNet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
@@ -9,14 +8,9 @@ namespace LiveNet.Api.Controllers;
 
 [Route("Api/[controller]")]
 [ApiController]
-public class ContatoController : ControllerBase
+public class ContatoController(IContatoService contato) : ControllerBase
 {
-    private readonly IContatoService _service;
-
-    public ContatoController(IContatoService contato)
-    {
-        _service = contato;
-    }
+    private readonly IContatoService _service = contato;
 
     [HttpGet(Name = "BuscarContatos")]
     public async Task<ActionResult<IEnumerable<ContatoViewModel>>> GetAsync()
@@ -42,16 +36,25 @@ public class ContatoController : ControllerBase
     }
 
     [HttpPost("Adicionar", Name = "AdicionarContatosManual")]
-    public async Task PostAsync(ContatoModel contato)
+    public async Task<IActionResult> PostAsync(ContatoViewModel contato, Guid empresaId)
     {
-        await _service.CriarContatoManualAsync(contato);
+        if (ModelState.IsValid)
+            return BadRequest();
+
+        var model = ContatoMapper.ToContatoModel(contato, empresaId);
+        await _service.CriarContatoManualAsync(model);
+        return Ok();
     }
 
     [HttpPatch("{Id}", Name = "AtualizarContato")]
-    public async Task<ActionResult> PatchAsync(int id, ContatoModel contato)
+    public async Task<ActionResult> PatchAsync(Guid id, ContatoViewModel contato, Guid empresaId)
     {
-        var retorno = await _service.AtualizarContatoAsync(id, contato);
-        if (retorno != null)
+        if (ModelState.IsValid)
+            return BadRequest();
+
+        var model = ContatoMapper.ToContatoModel(contato, empresaId);
+        var retorno = await _service.AtualizarContatoAsync(id, model);
+        if (retorno)
             return Ok();
         else
             return BadRequest();
@@ -61,7 +64,7 @@ public class ContatoController : ControllerBase
     public async Task<ActionResult> DeleteAsync(int id)
     {
         var retorno = await _service.ExcluirContatoAsync(id);
-        if (retorno == 1)
+        if (retorno)
             return Ok();
         else
             return BadRequest();

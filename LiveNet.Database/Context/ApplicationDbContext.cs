@@ -5,11 +5,8 @@ using Microsoft.EntityFrameworkCore.Design;
 using System.Linq.Expressions;
 
 namespace LiveNet.Database.Context;
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-    {
-    }
     public DbSet<ContatoModel> Contato { get; set; }
     public DbSet<EmpresaModel> Empresa { get; set; }
     public DbSet<FavoritosModel> Favoritos { get; set; }
@@ -56,7 +53,7 @@ public class ApplicationDbContext : DbContext
         //Builder Favoritos
         modelBuilder.Entity<FavoritosModel>(entity =>
         {
-            entity.HasKey(x => new { x.UsuarioId, x.ContatoId});
+            entity.HasKey(x => new { x.UsuarioId, x.ContatoId });
 
             entity.HasOne(x => x.Usuario)
                   .WithMany()
@@ -76,7 +73,7 @@ public class ApplicationDbContext : DbContext
                   .HasMaxLength(14)
                   .IsRequired();
 
-            entity.Property(e => e.Nome)
+            entity.Property(e => e.RazaoSocial)
                   .HasMaxLength(150)
                   .IsRequired();
         });

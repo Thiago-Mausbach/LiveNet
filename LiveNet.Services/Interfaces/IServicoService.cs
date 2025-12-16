@@ -6,6 +6,6 @@ public interface IServicoService
 {
     Task<List<ServicoModel>> BuscarServicosAsync();
     Task CriarServicoAsync(ServicoModel servico);
-    Task<ServicoModel> AtualizarServicoAsync(ServicoModel servico);
-    Task<int> DeletarServicoAsync(int id);
+    Task<bool> AtualizarServicoAsync(ServicoModel servico);
+    Task<bool> DeletarServicoAsync(int id);
 }

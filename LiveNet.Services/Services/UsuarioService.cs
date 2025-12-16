@@ -6,10 +6,11 @@ using System.Data.Entity;
 
 namespace LiveNet.Services.Services;
 
-public class UsuarioService : IUsuarioService
+public class UsuarioService(ApplicationDbContext context, UsuarioAtualService usuarioAtualService) : IUsuarioService
 {
 
-    private readonly ApplicationDbContext _context;
+    private readonly ApplicationDbContext _context = context;
+    private readonly UsuarioAtualService _usuarioAtualService = usuarioAtualService;
 
     public async Task<List<UsuarioModel>> BuscarUsuariosAsync()
     {
@@ -22,31 +23,33 @@ public class UsuarioService : IUsuarioService
         await _context.SaveChangesAsync();
     }
 
-    public async Task<UsuarioModel> EditarUsuarioAsync(UsuarioModel usuario)
+    public async Task<bool> EditarUsuarioAsync(UsuarioModel usuario)
     {
         var original = await _context.Usuario.FindAsync(usuario.Id);
-        if (original == null) return original;
+        if (original == null) return false;
 
         EntityDiffValidate.ValidarDif(original, usuario);
 
         original.UpdatedAt = DateTimeOffset.Now;
+        original.UpdatedBy = _usuarioAtualService.UsuarioId;
         await _context.SaveChangesAsync();
-        return usuario;
+        return true;
     }
 
-    public async Task<int> DeletarUsuariosAsync(Guid id)
+    public async Task<bool> DeletarUsuariosAsync(Guid id)
     {
         var servico = await _context.Usuario.FirstOrDefaultAsync(x => x.Id == id);
         if (servico != null)
         {
             servico.IsDeleted = true;
             servico.DeletedAt = DateTime.Now;
-            return 1;
-            //TODO ver como capturar o id do usuário alterando
+            servico.DeletedBy = _usuarioAtualService.UsuarioId;
+            await _context.SaveChangesAsync();
+            return true;
         }
         else
         {
-            return 0;
+            return false;
         }
     }
 }

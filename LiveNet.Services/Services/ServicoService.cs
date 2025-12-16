@@ -6,10 +6,10 @@ using System.Data.Entity;
 
 namespace LiveNet.Services.Services;
 
-internal class ServicoService : IServicoService
+internal class ServicoService(ApplicationDbContext context, UsuarioAtualService usuarioAtualService) : IServicoService
 {
-    private readonly ApplicationDbContext _context;
-    private readonly UsuarioAtualService _usuarioAtualService;
+    private readonly ApplicationDbContext _context = context;
+    private readonly UsuarioAtualService _usuarioAtualService = usuarioAtualService;
 
 
     public async Task<List<ServicoModel>> BuscarServicosAsync()
@@ -23,20 +23,20 @@ internal class ServicoService : IServicoService
         await _context.SaveChangesAsync();
     }
 
-    public async Task<ServicoModel> AtualizarServicoAsync(ServicoModel servico)
+    public async Task<bool> AtualizarServicoAsync(ServicoModel servico)
     {
         var original = await _context.Servico.FindAsync(servico.Id);
-        if (original == null) return original;
+        if (original == null) return false;
 
         EntityDiffValidate.ValidarDif(original, servico);
 
         original.UpdatedAt = DateTimeOffset.Now;
         original.UpdatedBy = _usuarioAtualService.UsuarioId;
         await _context.SaveChangesAsync();
-        return original;
+        return true;
     }
 
-    public async Task<int> DeletarServicoAsync(int id)
+    public async Task<bool> DeletarServicoAsync(int id)
     {
         var servico = await _context.Servico.FirstOrDefaultAsync(x => x.Id == id);
         if (servico != null)
@@ -45,11 +45,11 @@ internal class ServicoService : IServicoService
             servico.DeletedAt = DateTime.Now;
             servico.DeletedBy = _usuarioAtualService.UsuarioId;
             await _context.SaveChangesAsync();
-            return 1;
+            return true;
         }
         else
         {
-            return 0;
+            return false;
         }
     }
 }

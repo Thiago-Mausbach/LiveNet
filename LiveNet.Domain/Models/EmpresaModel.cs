@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LiveNet.Domain.Interfaces;
 
 namespace LiveNet.Domain.Models;
 
-public class EmpresaModel
+public class EmpresaModel : IAuditColumns, ISoftDelete
 {
     public Guid Id { get; set; }
     public string Cnpj { get; set; } = null!;
-    public string Nome { get; set; } = null!;
-    public List<ContatoModel> Contatos { get; set; } = new();
+    public string RazaoSocial { get; set; } = null!;
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
+    public Guid? UpdatedBy { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; }
+    public Guid? DeletedBy { get; set; }
+    public bool IsDeleted { get; set; }
 }
 
