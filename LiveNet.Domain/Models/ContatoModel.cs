@@ -13,7 +13,7 @@ public class ContatoModel : IAuditColumns, ISoftDelete
     public string? CnpjEmpresa { get; set; }
     public string? Cargo { get; set; }
     public bool Cliente { get; set; }
-    public List<ContatoInteresseModel>? Interesses { get; set; }
+    public ICollection<ContatoInteresseModel>? Interesses { get; set; }
     public string? ModoInclusao { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? UpdatedAt { get; set; }

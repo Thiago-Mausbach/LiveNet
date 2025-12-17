@@ -11,11 +11,16 @@ public static class ViewModelMapper
         {
             Nome = value.Nome,
             EmailPessoal = value.EmailPessoal,
+            CnpjEmpresa = value.CnpjEmpresa,
             Empresa = value.Empresa.RazaoSocial,
             EmailEmpresa = value.EmailEmpresa,
             Cargo = value.Cargo,
             Telefone = value.Telefone,
-            Interesses = value.Interesses,
+            Interesses = value.Interesses.Select(i => new InteresseViewModel
+            {
+                Id = i.Id,
+                Interesse = i.Interesse.Interesse
+            }).ToList(),
             ModoInclusao = value.ModoInclusao,
             Servicos = value.Servicos.Select(s => new ServicoViewModel
             {
@@ -55,6 +60,16 @@ public static class ViewModelMapper
             Id = value.Id,
             RazaoSocial = value.RazaoSocial,
             Cnpj = value.Cnpj,
+        };
+        return result;
+    }
+
+    public static InteresseViewModel ToInteresseDto(this InteresseModel value)
+    {
+        var result = new InteresseViewModel
+        {
+            Interesse = value.Interesse,
+            Id = value.Id
         };
         return result;
     }

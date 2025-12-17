@@ -37,12 +37,12 @@ public class UsuarioController(IUsuarioService service) : ControllerBase
             return BadRequest();
     }
     [HttpPatch("{id}", Name = "AtualizarUsuario")]
-    public async Task<ActionResult> PatchAsync(UsuarioViewModel usuario, int id)
+    public async Task<ActionResult> PatchAsync(UsuarioViewModel usuario, Guid id)
     {
         if (ModelState.IsValid)
         {
             var model = UsuarioMapper.ToUsuarioModel(usuario);
-            var retorno = await _service.EditarUsuarioAsync(model);
+            var retorno = await _service.EditarUsuarioAsync(model, id);
             if (retorno)
                 return Ok();
             else
@@ -62,4 +62,3 @@ public class UsuarioController(IUsuarioService service) : ControllerBase
             return BadRequest();
     }
 }
-

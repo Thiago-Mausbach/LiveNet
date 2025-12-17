@@ -20,9 +20,22 @@ public static class ContatoMapper
             Telefone = viewModel.Telefone,
             Cargo = viewModel.Cargo,
             Cliente = viewModel.Cliente,
-            Interesses = viewModel.Interesses,
             ModoInclusao = viewModel.ModoInclusao,
-            EmpresaId = empresaId
+            CnpjEmpresa = viewModel.CnpjEmpresa,
+
+            Interesses = viewModel.Interesses?
+                .Select(i => new ContatoInteresseModel
+                {
+                    InteresseId = i.Id
+                })
+                .ToList(),
+
+            Servicos = viewModel.Servicos?
+                .Select(s => new ContatoServicoModel
+                {
+                    ServicoId = s.Id
+                })
+                .ToList()
         };
     }
 }

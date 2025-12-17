@@ -37,10 +37,10 @@ public class ServicoController(IServicoService service) : ControllerBase
     }
 
     [HttpPatch("{id}", Name = "AtualizarServico")]
-    public async Task<ActionResult> PatchAsync(ServicoViewModel servico)
+    public async Task<ActionResult> PatchAsync(ServicoViewModel servico, Guid id)
     {
         var model = ServicoMapper.ToServicoModel(servico);
-        var retorno = await _service.AtualizarServicoAsync(model);
+        var retorno = await _service.AtualizarServicoAsync(model, id);
         if (retorno)
             return Ok();
         else
@@ -48,7 +48,7 @@ public class ServicoController(IServicoService service) : ControllerBase
     }
 
     [HttpDelete("{id}", Name = "DeletarServico")]
-    public async Task<ActionResult> DeleteAsync(int id)
+    public async Task<ActionResult> DeleteAsync(Guid id)
     {
         var retorno = await _service.DeletarServicoAsync(id);
         if (retorno)

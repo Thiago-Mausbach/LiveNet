@@ -4,7 +4,7 @@ namespace LiveNet.Api.ViewModels
 {
     public class ServicoViewModel
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         [Required]
         [StringLength(30)]
         public string Servico { get; set; } = null!;

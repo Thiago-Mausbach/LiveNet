@@ -1,6 +1,7 @@
 ﻿using LiveNet.Database.Context;
 using LiveNet.Domain.Models;
 using LiveNet.Infrastructure;
+using LiveNet.Services.Dtos;
 using LiveNet.Services.Interfaces;
 using System.Data.Entity;
 
@@ -10,9 +11,15 @@ public class EmpresaService(ApplicationDbContext context, UsuarioAtualService us
 {
     private readonly ApplicationDbContext _context = context;
     private readonly UsuarioAtualService _usuarioAtualService = usuarioAtualService;
-    public async Task<List<EmpresaModel>> ListarEmpresasAsync()
+    public async Task<List<EmpresaDto>> ListarEmpresasAsync()
     {
-        return await _context.Empresas.ToListAsync();
+        return await _context.Empresas
+            .AsNoTracking().Select(e => new EmpresaDto
+            {
+                Id = e.Id,
+                Cnpj = e.Cnpj,
+                RazaoSocial = e.RazaoSocial,
+            }).ToListAsync();
     }
 
     public async Task<bool> CriarEmpresaAsync(EmpresaModel empresa)

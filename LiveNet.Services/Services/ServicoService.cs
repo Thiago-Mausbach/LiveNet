@@ -1,6 +1,7 @@
 ﻿using LiveNet.Database.Context;
 using LiveNet.Domain.Models;
 using LiveNet.Infrastructure;
+using LiveNet.Services.Dtos;
 using LiveNet.Services.Interfaces;
 using System.Data.Entity;
 
@@ -12,9 +13,15 @@ internal class ServicoService(ApplicationDbContext context, UsuarioAtualService 
     private readonly UsuarioAtualService _usuarioAtualService = usuarioAtualService;
 
 
-    public async Task<List<ServicoModel>> BuscarServicosAsync()
+    public async Task<List<ServicoDto>> BuscarServicosAsync()
     {
-        return await _context.Servicos.ToListAsync();
+        return await _context.Servicos
+            .Select(s => new ServicoDto
+            {
+                Id = s.Id,
+                Servico = s.Servico
+            }).ToListAsync();
+
     }
 
     public async Task CriarServicoAsync(ServicoModel servico)
@@ -23,7 +30,7 @@ internal class ServicoService(ApplicationDbContext context, UsuarioAtualService 
         await _context.SaveChangesAsync();
     }
 
-    public async Task<bool> AtualizarServicoAsync(ServicoModel servico)
+    public async Task<bool> AtualizarServicoAsync(ServicoModel servico, Guid id)
     {
         var original = await _context.Servicos.FindAsync(servico.Id);
         if (original == null) return false;
@@ -38,18 +45,13 @@ internal class ServicoService(ApplicationDbContext context, UsuarioAtualService 
 
     public async Task<bool> DeletarServicoAsync(Guid id)
     {
-        var servico = await _context.Servicos.FirstOrDefaultAsync(x => x.Id == id);
-        if (servico != null)
-        {
-            servico.IsDeleted = true;
-            servico.DeletedAt = DateTime.Now;
-            servico.DeletedBy = _usuarioAtualService.UsuarioId;
-            await _context.SaveChangesAsync();
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        var servico = await _context.Servicos.FindAsync(id);
+        if (servico == null) return false;
+
+        servico.IsDeleted = true;
+        servico.DeletedAt = DateTime.Now;
+        servico.DeletedBy = _usuarioAtualService.UsuarioId;
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

@@ -1,5 +1,7 @@
 ﻿using LiveNet.Database.Context;
 using LiveNet.Domain.Models;
+using LiveNet.Services.Dtos;
+using LiveNet.Services.Expressions;
 using LiveNet.Services.Interfaces;
 using System.Data.Entity;
 
@@ -10,11 +12,12 @@ public class FavoritoService(ApplicationDbContext context, UsuarioAtualService u
     private readonly ApplicationDbContext _context = context;
     private readonly UsuarioAtualService _usuarioAtualService = usuarioAtualService;
 
-    public async Task<IEnumerable<ContatoModel>> ListarFavoritosAsync()
+    public async Task<IEnumerable<ContatoDto>> ListarFavoritosAsync()
     {
         return await _context.Favoritos
             .Where(x => x.UsuarioId == _usuarioAtualService.UsuarioId)
-            .Select(x => x.Contato).ToListAsync();
+            .Select(x => x.Contato)
+            .Select(ContatoExpressions.ToContatoDto).ToListAsync();
     }
 
     public async Task<bool> ToggleAsync(Guid contatoId)

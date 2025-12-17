@@ -51,76 +51,19 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         //Override que remove itens com "IsDeleted" sendo 'true' de listangens
         modelBuilder.Entity<ContatoModel>().HasQueryFilter(l => !l.IsDeleted);
+        modelBuilder.Entity<EmpresaModel>().HasQueryFilter(l => !l.IsDeleted);
+        modelBuilder.Entity<InteresseModel>().HasQueryFilter(l => !l.IsDeleted);
+        modelBuilder.Entity<ServicoModel>().HasQueryFilter(l => !l.IsDeleted);
+        modelBuilder.Entity<UsuarioModel>().HasQueryFilter(l => !l.IsDeleted);
 
-        //Builder Favoritos
-        modelBuilder.Entity<FavoritosModel>(entity =>
-        {
-            entity.HasKey(x => new { x.UsuarioId, x.ContatoId });
-
-            entity.HasOne(x => x.Usuario)
-                  .WithMany()
-                  .HasForeignKey(x => x.UsuarioId);
-
-            entity.HasOne(x => x.Contato)
-                  .WithMany()
-                  .HasForeignKey(x => x.ContatoId);
-        });
-
-        //Builder Empresa
-        modelBuilder.Entity<EmpresaModel>(entity =>
-        {
-            entity.HasIndex(e => e.Cnpj).IsUnique();
-
-            entity.Property(e => e.Cnpj)
-                  .IsRequired();
-
-            entity.Property(e => e.RazaoSocial)
-                  .IsRequired();
-        });
-
-
-        //Builder Contato
-        modelBuilder.Entity<ContatoModel>(entity =>
-        {
-            entity.HasOne(c => c.Empresa)
-                  .WithMany()
-                  .HasForeignKey(c => c.CnpjEmpresa)
-                  .OnDelete(DeleteBehavior.SetNull);
-        });
-
-        //Builder do relacionamento Contato - Interesse (N-N)
-        modelBuilder.Entity<ContatoInteresseModel>(entity =>
-        {
-            entity.HasKey(x => new { x.ContatoId, x.InteresseId });
-
-            entity.HasOne(x => x.Contato)
-                  .WithMany(c => c.Interesses)
-                  .HasForeignKey(x => x.ContatoId);
-
-            entity.HasOne(x => x.Interesse)
-                  .WithMany()
-                  .HasForeignKey(x => x.InteresseId);
-        });
-
-        modelBuilder.Entity<ContatoServicoModel>(entity =>
-        {
-            entity.HasKey(x => new { x.ContatoId, x.ServicoId });
-
-            entity.HasOne(x => x.Contato)
-                  .WithMany(c => c.Servicos)
-                  .HasForeignKey(x => x.ContatoId);
-
-            entity.HasOne(x => x.Servico)
-                  .WithMany()
-                  .HasForeignKey(x => x.ServicoId);
-        });
-
+        //Aplica as configurações realizadas no Database.Configurations
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
         var softDeleteEntities = typeof(ISoftDelete).Assembly.GetTypes()
-    .Where(type => typeof(ISoftDelete)
-                    .IsAssignableFrom(type)
-                    && type.IsClass
-                    && !type.IsAbstract);
+                .Where(type => typeof(ISoftDelete)
+                .IsAssignableFrom(type)
+                && type.IsClass
+                && !type.IsAbstract);
 
         foreach (var softDeleteEntity in softDeleteEntities)
         {

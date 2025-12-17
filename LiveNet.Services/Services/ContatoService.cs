@@ -3,6 +3,8 @@ using LiveNet.Database.Context;
 using LiveNet.Database.Mappers;
 using LiveNet.Domain.Models;
 using LiveNet.Infrastructure;
+using LiveNet.Services.Dtos;
+using LiveNet.Services.Expressions;
 using LiveNet.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System.Data.Entity;
@@ -16,10 +18,12 @@ public class ContatoService(ApplicationDbContext context,
     private readonly ApplicationDbContext _context = context;
     private readonly UsuarioAtualService _usuarioAtualService = usuarioAtualService;
 
-    public async Task<List<ContatoModel>> BuscarContatosAsync()
+    public async Task<List<ContatoDto>> BuscarContatosAsync()
     {
-        var ret = await _context.Contatos.ToListAsync();
-        return ret;
+        return await _context.Contatos
+            .Select(ContatoExpressions.ToContatoDto)
+            .ToListAsync();
+
     }
 
     public async Task<bool> UploadListaAsync(IFormFile file, string nome)
@@ -79,6 +83,7 @@ public class ContatoService(ApplicationDbContext context,
         {
             contatoExcluido.IsDeleted = true;
             contatoExcluido.DeletedBy = _usuarioAtualService.UsuarioId;
+            contatoExcluido.DeletedAt = DateTimeOffset.Now;
             await _context.SaveChangesAsync();
             return true;
         }

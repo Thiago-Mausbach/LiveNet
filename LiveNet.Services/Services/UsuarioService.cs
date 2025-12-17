@@ -1,6 +1,7 @@
 ﻿using LiveNet.Database.Context;
 using LiveNet.Domain.Models;
 using LiveNet.Infrastructure;
+using LiveNet.Services.Dtos;
 using LiveNet.Services.Interfaces;
 using System.Data.Entity;
 
@@ -12,9 +13,15 @@ public class UsuarioService(ApplicationDbContext context, UsuarioAtualService us
     private readonly ApplicationDbContext _context = context;
     private readonly UsuarioAtualService _usuarioAtualService = usuarioAtualService;
 
-    public async Task<List<UsuarioModel>> BuscarUsuariosAsync()
+    public async Task<List<UsuarioDto>> BuscarUsuariosAsync()
     {
-        return await _context.Usuarios.ToListAsync();
+        return await _context.Usuarios
+            .Select(u => new UsuarioDto
+            {
+                Nome = u.Nome,
+                Email = u.Email,
+                Id = u.Id,
+            }).ToListAsync();
     }
 
     public async Task CriarUsuarioAsync(UsuarioModel usuario)
@@ -23,9 +30,9 @@ public class UsuarioService(ApplicationDbContext context, UsuarioAtualService us
         await _context.SaveChangesAsync();
     }
 
-    public async Task<bool> EditarUsuarioAsync(UsuarioModel usuario)
+    public async Task<bool> EditarUsuarioAsync(UsuarioModel usuario, Guid id)
     {
-        var original = await _context.Usuarios.FindAsync(usuario.Id);
+        var original = await _context.Usuarios.FindAsync(id);
         if (original == null) return false;
 
         EntityDiffValidate.ValidarDif(original, usuario);
