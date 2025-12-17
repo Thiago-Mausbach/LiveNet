@@ -14,7 +14,7 @@ public class UsuarioService(ApplicationDbContext context, UsuarioAtualService us
 
     public async Task<List<UsuarioModel>> BuscarUsuariosAsync()
     {
-        return await _context.Usuario.ToListAsync();
+        return await _context.Usuarios.ToListAsync();
     }
 
     public async Task CriarUsuarioAsync(UsuarioModel usuario)
@@ -25,7 +25,7 @@ public class UsuarioService(ApplicationDbContext context, UsuarioAtualService us
 
     public async Task<bool> EditarUsuarioAsync(UsuarioModel usuario)
     {
-        var original = await _context.Usuario.FindAsync(usuario.Id);
+        var original = await _context.Usuarios.FindAsync(usuario.Id);
         if (original == null) return false;
 
         EntityDiffValidate.ValidarDif(original, usuario);
@@ -38,7 +38,7 @@ public class UsuarioService(ApplicationDbContext context, UsuarioAtualService us
 
     public async Task<bool> DeletarUsuariosAsync(Guid id)
     {
-        var servico = await _context.Usuario.FirstOrDefaultAsync(x => x.Id == id);
+        var servico = await _context.Usuarios.FirstOrDefaultAsync(x => x.Id == id);
         if (servico != null)
         {
             servico.IsDeleted = true;

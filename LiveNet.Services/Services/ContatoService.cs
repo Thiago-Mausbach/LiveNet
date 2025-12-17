@@ -18,7 +18,7 @@ public class ContatoService(ApplicationDbContext context,
 
     public async Task<List<ContatoModel>> BuscarContatosAsync()
     {
-        var ret = await _context.Contato.ToListAsync();
+        var ret = await _context.Contatos.ToListAsync();
         return ret;
     }
 
@@ -33,7 +33,7 @@ public class ContatoService(ApplicationDbContext context,
 
         foreach (var contato in contatos)
         {
-            var filtro = _context.Contato.FirstOrDefaultAsync(predicate: f => f.EmailEmpresa == contato.EmailEmpresa || f.EmailPessoal == contato.EmailPessoal);
+            var filtro = _context.Contatos.FirstOrDefaultAsync(predicate: f => f.EmailEmpresa == contato.EmailEmpresa || f.EmailPessoal == contato.EmailPessoal);
             if (filtro == null)
             {
                 contato.ModoInclusao = nome;
@@ -48,10 +48,10 @@ public class ContatoService(ApplicationDbContext context,
 
     public async Task<bool> CriarContatoManualAsync(ContatoModel contato)
     {
-        var filtro = _context.Contato.FirstOrDefaultAsync(predicate: f => f.EmailEmpresa == contato.EmailEmpresa || f.EmailPessoal == contato.EmailPessoal);
+        var filtro = _context.Contatos.FirstOrDefaultAsync(predicate: f => f.EmailEmpresa == contato.EmailEmpresa || f.EmailPessoal == contato.EmailPessoal);
         if (filtro == null)
         {
-            _context.Contato.Add(contato);
+            _context.Contatos.Add(contato);
             contato.ModoInclusao = "Manual";
             await _context.SaveChangesAsync();
             return true;
@@ -61,7 +61,7 @@ public class ContatoService(ApplicationDbContext context,
 
     public async Task<bool> AtualizarContatoAsync(Guid id, ContatoModel contato)
     {
-        var original = await _context.Contato.FindAsync(id);
+        var original = await _context.Contatos.FindAsync(id);
         if (original == null) return false;
 
         EntityDiffValidate.ValidarDif(original, contato);
@@ -74,7 +74,7 @@ public class ContatoService(ApplicationDbContext context,
 
     public async Task<bool> ExcluirContatoAsync(int id)
     {
-        var contatoExcluido = await _context.Contato.FindAsync(id);
+        var contatoExcluido = await _context.Contatos.FindAsync(id);
         if (contatoExcluido != null)
         {
             contatoExcluido.IsDeleted = true;

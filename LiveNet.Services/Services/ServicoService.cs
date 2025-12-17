@@ -14,18 +14,18 @@ internal class ServicoService(ApplicationDbContext context, UsuarioAtualService 
 
     public async Task<List<ServicoModel>> BuscarServicosAsync()
     {
-        return await _context.Servico.ToListAsync();
+        return await _context.Servicos.ToListAsync();
     }
 
     public async Task CriarServicoAsync(ServicoModel servico)
     {
-        _context.Servico.Add(servico);
+        _context.Servicos.Add(servico);
         await _context.SaveChangesAsync();
     }
 
     public async Task<bool> AtualizarServicoAsync(ServicoModel servico)
     {
-        var original = await _context.Servico.FindAsync(servico.Id);
+        var original = await _context.Servicos.FindAsync(servico.Id);
         if (original == null) return false;
 
         EntityDiffValidate.ValidarDif(original, servico);
@@ -36,9 +36,9 @@ internal class ServicoService(ApplicationDbContext context, UsuarioAtualService 
         return true;
     }
 
-    public async Task<bool> DeletarServicoAsync(int id)
+    public async Task<bool> DeletarServicoAsync(Guid id)
     {
-        var servico = await _context.Servico.FirstOrDefaultAsync(x => x.Id == id);
+        var servico = await _context.Servicos.FirstOrDefaultAsync(x => x.Id == id);
         if (servico != null)
         {
             servico.IsDeleted = true;

@@ -12,12 +12,12 @@ public class EmpresaService(ApplicationDbContext context, UsuarioAtualService us
     private readonly UsuarioAtualService _usuarioAtualService = usuarioAtualService;
     public async Task<List<EmpresaModel>> ListarEmpresasAsync()
     {
-        return await _context.Empresa.ToListAsync();
+        return await _context.Empresas.ToListAsync();
     }
 
     public async Task<bool> CriarEmpresaAsync(EmpresaModel empresa)
     {
-        _context.Empresa.Add(empresa);
+        _context.Empresas.Add(empresa);
         var ret = await _context.SaveChangesAsync();
         if (ret > 0)
             return true;
@@ -27,7 +27,7 @@ public class EmpresaService(ApplicationDbContext context, UsuarioAtualService us
 
     public async Task<bool> AtualizarEmpresaAsync(Guid id, EmpresaModel empresa)
     {
-        var original = await _context.Empresa.FindAsync(id);
+        var original = await _context.Empresas.FindAsync(id);
         if (original == null) return false;
 
         EntityDiffValidate.ValidarDif(original, empresa);
@@ -40,7 +40,7 @@ public class EmpresaService(ApplicationDbContext context, UsuarioAtualService us
 
     public async Task<bool> RemoverEmpresaAsync(Guid id)
     {
-        var empresa = await _context.Empresa.FindAsync(id);
+        var empresa = await _context.Empresas.FindAsync(id);
         if (empresa == null)
             return false;
         else

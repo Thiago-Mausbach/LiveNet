@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace LiveNet.Domain.Models;
 
-public class UsuarioServicoModel
+public class ContatoServicoModel
 {
     public int ServicoId { get; set; }
-    public ServicoModel Servico { get; set; }
     public Guid ContatoId { get; set; }
+    public ServicoModel Servico { get; set; }
     public ContatoModel Contato { get; set; }
 
 }

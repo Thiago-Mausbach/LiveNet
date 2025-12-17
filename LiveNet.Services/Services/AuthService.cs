@@ -20,7 +20,7 @@ public class AuthService(ApplicationDbContext context, IConfiguration configurat
 
     public async Task<AuthResult> LoginAsync(LoginViewModel model)
     {
-        UsuarioModel? user = await _context.Usuario.FirstOrDefaultAsync(u => u.Email == model.Email);
+        UsuarioModel? user = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == model.Email);
         if (user == null || _passwordHasher.VerifyHashedPassword(user, user.Senha, model.Senha) != PasswordVerificationResult.Success)
             return new AuthResult { Sucesso = false, Mensagem = "Email ou senha incorretos" };
 

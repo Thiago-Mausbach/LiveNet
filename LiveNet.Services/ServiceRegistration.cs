@@ -18,6 +18,7 @@ public static class ServiceRegistration
         services.AddScoped<IContatoService, ContatoService>();
         services.AddScoped<IEmpresaService, EmpresaService>();
         services.AddScoped<IFavoritoService, FavoritoService>();
+        services.AddScoped<IInteresseService, InteresseService>();
         services.AddScoped<IServicoService, ServicoService>();
         services.AddScoped<IUsuarioAtualService, UsuarioAtualService>();
         services.AddScoped<IUsuarioService, UsuarioService>();

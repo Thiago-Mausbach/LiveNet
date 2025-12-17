@@ -10,10 +10,10 @@ public class ContatoModel : IAuditColumns, ISoftDelete
     public string? EmailEmpresa { get; set; }
     public string? EmailPessoal { get; set; }
     public string? Telefone { get; set; }
-    public Guid? EmpresaId { get; set; }
+    public string? CnpjEmpresa { get; set; }
     public string? Cargo { get; set; }
     public bool Cliente { get; set; }
-    public List<string>? Interesses { get; set; }
+    public List<ContatoInteresseModel>? Interesses { get; set; }
     public string? ModoInclusao { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? UpdatedAt { get; set; }
@@ -21,6 +21,6 @@ public class ContatoModel : IAuditColumns, ISoftDelete
     public DateTimeOffset? DeletedAt { get; set; }
     public Guid? DeletedBy { get; set; }
     public bool IsDeleted { get; set; }
-    public ICollection<UsuarioServicoModel>? Servicos { get; set; }
+    public ICollection<ContatoServicoModel>? Servicos { get; set; }
     public EmpresaModel? Empresa { get; set; }
 }

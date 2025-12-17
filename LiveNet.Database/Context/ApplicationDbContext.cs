@@ -7,12 +7,14 @@ using System.Linq.Expressions;
 namespace LiveNet.Database.Context;
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
-    public DbSet<ContatoModel> Contato { get; set; }
-    public DbSet<EmpresaModel> Empresa { get; set; }
+    public DbSet<ContatoInteresseModel> ContatoInteresse { get; set; }
+    public DbSet<ContatoModel> Contatos { get; set; }
+    public DbSet<ContatoServicoModel> ContatoServico { get; set; }
+    public DbSet<EmpresaModel> Empresas { get; set; }
     public DbSet<FavoritosModel> Favoritos { get; set; }
-    public DbSet<ServicoModel> Servico { get; set; }
-    public DbSet<UsuarioModel> Usuario { get; set; }
-    public DbSet<UsuarioServicoModel> UsuarioServico { get; set; }
+    public DbSet<InteresseModel> Interesses { get; set; }
+    public DbSet<ServicoModel> Servicos { get; set; }
+    public DbSet<UsuarioModel> Usuarios { get; set; }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
@@ -70,11 +72,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.HasIndex(e => e.Cnpj).IsUnique();
 
             entity.Property(e => e.Cnpj)
-                  .HasMaxLength(14)
                   .IsRequired();
 
             entity.Property(e => e.RazaoSocial)
-                  .HasMaxLength(150)
                   .IsRequired();
         });
 
@@ -84,8 +84,35 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         {
             entity.HasOne(c => c.Empresa)
                   .WithMany()
-                  .HasForeignKey(c => c.EmpresaId)
+                  .HasForeignKey(c => c.CnpjEmpresa)
                   .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        //Builder do relacionamento Contato - Interesse (N-N)
+        modelBuilder.Entity<ContatoInteresseModel>(entity =>
+        {
+            entity.HasKey(x => new { x.ContatoId, x.InteresseId });
+
+            entity.HasOne(x => x.Contato)
+                  .WithMany(c => c.Interesses)
+                  .HasForeignKey(x => x.ContatoId);
+
+            entity.HasOne(x => x.Interesse)
+                  .WithMany()
+                  .HasForeignKey(x => x.InteresseId);
+        });
+
+        modelBuilder.Entity<ContatoServicoModel>(entity =>
+        {
+            entity.HasKey(x => new { x.ContatoId, x.ServicoId });
+
+            entity.HasOne(x => x.Contato)
+                  .WithMany(c => c.Servicos)
+                  .HasForeignKey(x => x.ContatoId);
+
+            entity.HasOne(x => x.Servico)
+                  .WithMany()
+                  .HasForeignKey(x => x.ServicoId);
         });
 
 
@@ -102,16 +129,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
             modelBuilder.Entity(softDeleteEntity).HasIndex(nameof(ISoftDelete.IsDeleted));
         }
-
-        //Converte os interesses adicionados em uma lista de string
-        modelBuilder.Entity<ContatoModel>()
-        .Property(c => c.Interesses)
-        .HasConversion(
-         v => string.Join(",", v),
-        v => v.Split(',', StringSplitOptions.RemoveEmptyEntries)
-          .Select(x => x.Trim()) // remove espaços extras
-          .ToList()
-);
 
         base.OnModelCreating(modelBuilder);
     }
