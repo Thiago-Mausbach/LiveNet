@@ -29,9 +29,13 @@ public class ContatoController(IContatoService contato) : ControllerBase
             return BadRequest("Arquivo inválido");
 
 
-        await _service.UploadListaAsync(file, file.FileName);
+        var ret = await _service.UploadListaAsync(file);
 
-        return Ok("Importação concluída");
+        return Ok(new
+        {
+            totalImportados = ret.TotalImportados,
+            emailsDuplicados = ret.EmailsDuplicados
+        });
 
     }
 

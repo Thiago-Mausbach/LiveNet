@@ -22,9 +22,25 @@ public class ContatoConfiguration : IEntityTypeConfiguration<ContatoModel>
                .HasForeignKey(x => x.CnpjEmpresa)
                .OnDelete(DeleteBehavior.SetNull);
 
-        entity.Property(x => x.EmailEmpresa).HasMaxLength(45);
+        entity.HasIndex(x => x.EmailEmpresa).IsUnique();
 
-        entity.Property(x => x.EmailPessoal).HasMaxLength(45);
+        entity.HasIndex(x => x.EmailPessoal).IsUnique();
+
+        entity.Property(c => c.EmailPessoal)
+       .HasConversion(
+           v => v.ToLower(),
+           v => v
+       );
+
+        entity.Property(c => c.EmailEmpresa)
+.HasConversion(
+   v => v.ToLower(),
+   v => v
+);
+
+        entity.Property(x => x.EmailEmpresa.ToLower()).HasMaxLength(45);
+
+        entity.Property(x => x.EmailPessoal.ToLower()).HasMaxLength(45);
 
         entity.Property(x => x.Telefone).HasMaxLength(11).IsFixedLength(true);
 

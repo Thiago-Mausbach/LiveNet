@@ -26,8 +26,11 @@ public class ContatoService(ApplicationDbContext context,
 
     }
 
-    public async Task<bool> UploadListaAsync(IFormFile file, string nome)
+    public async Task<ImportacaoContatoDto> UploadListaAsync(IFormFile file)
     {
+
+        var nome = Path.GetFileName(file.FileName);
+        //Criação da da listagem 
         using var stream = file.OpenReadStream();
         using var reader = new StreamReader(stream);
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
@@ -35,19 +38,59 @@ public class ContatoService(ApplicationDbContext context,
         csv.Context.RegisterClassMap<ContatoMapper>();
         var contatos = csv.GetRecords<ContatoModel>().ToList();
 
-        foreach (var contato in contatos)
+        var emailsDuplicados = new HashSet<string>();
+        var totalImportados = 0;
+
+        foreach (var chunk in contatos.Chunk(40))
         {
-            var filtro = _context.Contatos.FirstOrDefaultAsync(predicate: f => f.EmailEmpresa == contato.EmailEmpresa || f.EmailPessoal == contato.EmailPessoal);
-            if (filtro == null)
+
+            //Seleciona os Emails do chunk
+            var emails = chunk
+                .Where(e => !string.IsNullOrWhiteSpace(e.EmailEmpresa))
+                .Select(c => c.EmailEmpresa!.Trim().ToLower())
+                .Distinct()
+                .ToList();
+
+            //busca a lista de emails existentes na tabela de contatos
+            var existentes = await context.Contatos
+                .Where(c => emails.Contains(c.EmailEmpresa!))
+                .Select(c => c.EmailEmpresa)
+                .ToListAsync();
+
+            //Converte para HashSet
+            var existentesSet = existentes.ToHashSet();
+
+            //Valida emails que não tem o mesmo hashSet
+            var novos = chunk
+                .Where(c =>
+                    string.IsNullOrWhiteSpace(c.EmailEmpresa) ||
+                    !existentesSet.Contains(c.EmailEmpresa.Trim().ToLower()))
+                .ToList();
+
+            var duplicados = emails
+                .Where(e => existentesSet.Contains(e))
+                .ToList();
+
+            foreach (var email in duplicados)
+            {
+                emailsDuplicados.Add(email);
+            }
+
+            foreach (var contato in novos)
             {
                 contato.ModoInclusao = nome;
-                await _context.AddAsync(contato);
             }
-            else { /*criar uma lista com os contatos não adicionados e apresentar no front*/}
+
+            totalImportados += novos.Count;
+            context.Contatos.AddRange(novos);
+            await context.SaveChangesAsync();
         }
 
-        await _context.SaveChangesAsync();
-        return true;
+        return new ImportacaoContatoDto
+        {
+            TotalImportados = totalImportados,
+            EmailsDuplicados = emailsDuplicados.ToList()
+        };
     }
 
     public async Task<bool> CriarContatoManualAsync(ContatoModel contato)
