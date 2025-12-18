@@ -17,7 +17,7 @@ public class ContatoController(IContatoService contato) : ControllerBase
     {
         var contatos = await _service.BuscarContatosAsync();
         if (!contatos.IsNullOrEmpty())
-            return contatos.Select(c => c.ToContatoDto()).ToList();
+            return contatos.Select(c => c.ToContatoVm()).ToList();
         else
             return BadRequest();
     }

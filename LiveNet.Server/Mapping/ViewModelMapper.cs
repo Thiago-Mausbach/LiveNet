@@ -1,5 +1,6 @@
 ﻿using LiveNet.Api.ViewModels;
 using LiveNet.Domain.Models;
+using LiveNet.Services.Dtos;
 
 namespace LiveNet.Api.Mapping;
 
@@ -26,6 +27,32 @@ public static class ViewModelMapper
             {
                 Id = s.Servico.Id,
                 Servico = s.Servico.Servico
+            }).ToList()
+        };
+        return result;
+    }
+
+    public static ContatoViewModel ToContatoVm(this ContatoDto value)
+    {
+        var result = new ContatoViewModel
+        {
+            Nome = value.Nome,
+            EmailPessoal = value.EmailPessoal,
+            CnpjEmpresa = value.CnpjEmpresa,
+            Empresa = value.Empresa,
+            EmailEmpresa = value.EmailEmpresa,
+            Cargo = value.Cargo,
+            Telefone = value.Telefone,
+            Interesses = value.Interesses.Select(i => new InteresseViewModel
+            {
+                Id = i.Id,
+                Interesse = i.Interesse
+            }).ToList(),
+            ModoInclusao = value.ModoInclusao,
+            Servicos = value.Servicos.Select(s => new ServicoViewModel
+            {
+                Id = s.Id,
+                Servico = s.Servico
             }).ToList()
         };
         return result;
