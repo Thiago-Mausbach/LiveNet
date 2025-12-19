@@ -12,17 +12,17 @@ public class ContatoController(IContatoService contato) : ControllerBase
 {
     private readonly IContatoService _service = contato;
 
-    [HttpGet(Name = "BuscarContatos")]
+    [HttpGet("Buscar")]
     public async Task<ActionResult<IEnumerable<ContatoViewModel>>> GetAsync()
     {
         var contatos = await _service.BuscarContatosAsync();
         if (!contatos.IsNullOrEmpty())
-            return contatos.Select(c => c.ToContatoVm()).ToList();
+            return contatos.Select(c => c.ContatoDtoToVm()).ToList();
         else
             return BadRequest();
     }
 
-    [HttpPost("Importar", Name = "ImportarContatosCsv")]
+    [HttpPost("Importar")]
     public async Task<IActionResult> PostImportAsync(IFormFile file)
     {
         if (file == null || file.Length == 0)
@@ -39,7 +39,7 @@ public class ContatoController(IContatoService contato) : ControllerBase
 
     }
 
-    [HttpPost("Adicionar", Name = "AdicionarContatosManual")]
+    [HttpPost("Adicionar")]
     public async Task<IActionResult> PostAsync(ContatoViewModel contato, Guid empresaId)
     {
         if (ModelState.IsValid)
@@ -50,7 +50,7 @@ public class ContatoController(IContatoService contato) : ControllerBase
         return Ok();
     }
 
-    [HttpPatch("{Id}", Name = "AtualizarContato")]
+    [HttpPatch("Atualizar")]
     public async Task<ActionResult> PatchAsync(Guid id, ContatoViewModel contato, Guid empresaId)
     {
         if (ModelState.IsValid)
@@ -64,7 +64,7 @@ public class ContatoController(IContatoService contato) : ControllerBase
             return BadRequest();
     }
 
-    [HttpDelete("{Id}", Name = "DeletarContato")]
+    [HttpDelete("Deletar")]
     public async Task<ActionResult> DeleteAsync(int id)
     {
         var retorno = await _service.ExcluirContatoAsync(id);

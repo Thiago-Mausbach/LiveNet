@@ -3,14 +3,14 @@ using LiveNet.Domain.Models;
 using LiveNet.Infrastructure;
 using LiveNet.Services.Dtos;
 using LiveNet.Services.Interfaces;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace LiveNet.Services.Services;
 
-internal class ServicoService(ApplicationDbContext context, UsuarioAtualService usuarioAtualService) : IServicoService
+internal class ServicoService(ApplicationDbContext context, IUsuarioAtualService usuarioAtualService) : IServicoService
 {
     private readonly ApplicationDbContext _context = context;
-    private readonly UsuarioAtualService _usuarioAtualService = usuarioAtualService;
+    private readonly IUsuarioAtualService _usuarioAtualService = usuarioAtualService;
 
 
     public async Task<List<ServicoDto>> BuscarServicosAsync()
@@ -32,7 +32,7 @@ internal class ServicoService(ApplicationDbContext context, UsuarioAtualService 
 
     public async Task<bool> AtualizarServicoAsync(ServicoModel servico, Guid id)
     {
-        var original = await _context.Servicos.FindAsync(servico.Id);
+        var original = await _context.Servicos.FindAsync(id);
         if (original == null) return false;
 
         EntityDiffValidate.ValidarDif(original, servico);

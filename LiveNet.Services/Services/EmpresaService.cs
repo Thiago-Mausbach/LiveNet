@@ -3,14 +3,14 @@ using LiveNet.Domain.Models;
 using LiveNet.Infrastructure;
 using LiveNet.Services.Dtos;
 using LiveNet.Services.Interfaces;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace LiveNet.Services.Services;
 
-public class EmpresaService(ApplicationDbContext context, UsuarioAtualService usuarioAtualService) : IEmpresaService
+public class EmpresaService(ApplicationDbContext context, IUsuarioAtualService usuarioAtualService) : IEmpresaService
 {
     private readonly ApplicationDbContext _context = context;
-    private readonly UsuarioAtualService _usuarioAtualService = usuarioAtualService;
+    private readonly IUsuarioAtualService _usuarioAtualService = usuarioAtualService;
     public async Task<List<EmpresaDto>> ListarEmpresasAsync()
     {
         return await _context.Empresas
@@ -55,6 +55,7 @@ public class EmpresaService(ApplicationDbContext context, UsuarioAtualService us
             empresa.DeletedAt = DateTimeOffset.Now;
             empresa.DeletedBy = _usuarioAtualService.UsuarioId;
             empresa.IsDeleted = true;
+            await _context.SaveChangesAsync();
             return true;
         }
     }

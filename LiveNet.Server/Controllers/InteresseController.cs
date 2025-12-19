@@ -1,24 +1,24 @@
 ﻿using LiveNet.Api.Mapping;
 using LiveNet.Api.ViewModels;
-using LiveNet.Services.Services;
+using LiveNet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LiveNet.Api.Controllers;
 
 [Route("Api/[controller]")]
 [ApiController]
-public class InteresseController(InteresseService service) : ControllerBase
+public class InteresseController(IInteresseService service) : ControllerBase
 {
-    private readonly InteresseService _service = service;
+    private readonly IInteresseService _service = service;
 
-    [HttpGet]
+    [HttpGet("Buscar")]
     public async Task<IEnumerable<InteresseViewModel>> GetAsync()
     {
         var interesses = await _service.BuscarServicosAsync();
-        return interesses.Select(i => i.ToInteresseDto()).ToList();
+        return interesses.Select(i => i.ToInteresseVm()).ToList();
     }
 
-    [HttpPost]
+    [HttpPost("Criar")]
     public async Task<ActionResult> PostAsync(InteresseViewModel interesseViewModel)
     {
         if (ModelState.IsValid)
@@ -31,7 +31,7 @@ public class InteresseController(InteresseService service) : ControllerBase
             return BadRequest();
     }
 
-    [HttpPatch]
+    [HttpPatch("Editar")]
     public async Task<ActionResult> PatchAsync(InteresseViewModel interesseViewModel, Guid id)
     {
         if (ModelState.IsValid)
@@ -43,7 +43,7 @@ public class InteresseController(InteresseService service) : ControllerBase
         return BadRequest();
     }
 
-    [HttpDelete]
+    [HttpDelete("Deletar")]
     public async Task<ActionResult> DeleteAsync(Guid id)
     {
         await _service.ExcluirInteresseAsync(id);

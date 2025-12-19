@@ -1,6 +1,5 @@
 ﻿using LiveNet.Api.Mapping;
 using LiveNet.Api.ViewModels;
-using LiveNet.Domain.Models;
 using LiveNet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
@@ -15,28 +14,29 @@ public class UsuarioController(IUsuarioService service) : ControllerBase
 
     private readonly IUsuarioService _service = service;
 
-    [HttpGet(Name = "BuscarUsuario")]
+    [HttpGet("Buscar")]
     public async Task<ActionResult<IEnumerable<UsuarioViewModel>>> GetAsync()
     {
         var usuarios = await _service.BuscarUsuariosAsync();
-        if (usuarios.IsNullOrEmpty())
-            return usuarios.Select(u => u.ToUsuarioDto()).ToList();
+        if (!usuarios.IsNullOrEmpty())
+            return usuarios.Select(u => u.ToUsuarioVm()).ToList();
         else
             return NotFound("Nenhum usuário");
     }
 
-    [HttpPost(Name = "CriarUsuario")]
-    public async Task<ActionResult> PostAsync(UsuarioModel usuario)
+    [HttpPost("Criar")]
+    public async Task<ActionResult> PostAsync(UsuarioViewModel usuario)
     {
         if (ModelState.IsValid)
         {
-            await _service.CriarUsuarioAsync(usuario);
+            var model = UsuarioMapper.ToUsuarioModel(usuario);
+            await _service.CriarUsuarioAsync(model);
             return Created();
         }
         else
             return BadRequest();
     }
-    [HttpPatch("{id}", Name = "AtualizarUsuario")]
+    [HttpPatch("Editar")]
     public async Task<ActionResult> PatchAsync(UsuarioViewModel usuario, Guid id)
     {
         if (ModelState.IsValid)
@@ -52,7 +52,7 @@ public class UsuarioController(IUsuarioService service) : ControllerBase
             return BadRequest();
     }
 
-    [HttpDelete("{id}", Name = "DeletarUsuario")]
+    [HttpDelete("Deletar")]
     public async Task<ActionResult> DeleteAsync(Guid id)
     {
         var retorno = await _service.DeletarUsuariosAsync(id);

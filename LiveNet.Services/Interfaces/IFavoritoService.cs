@@ -5,5 +5,5 @@ namespace LiveNet.Services.Interfaces;
 public interface IFavoritoService
 {
     Task<IEnumerable<ContatoDto>> ListarFavoritosAsync();
-    Task<bool> ToggleAsync(Guid contatoId);
+    Task<bool> ToggleAsync(Guid contatoId, Guid usuarioId);
 }

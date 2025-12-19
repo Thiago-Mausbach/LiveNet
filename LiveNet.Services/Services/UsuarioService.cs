@@ -3,15 +3,14 @@ using LiveNet.Domain.Models;
 using LiveNet.Infrastructure;
 using LiveNet.Services.Dtos;
 using LiveNet.Services.Interfaces;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace LiveNet.Services.Services;
 
-public class UsuarioService(ApplicationDbContext context, UsuarioAtualService usuarioAtualService) : IUsuarioService
+public class UsuarioService(ApplicationDbContext context, IUsuarioAtualService usuarioAtualService) : IUsuarioService
 {
-
     private readonly ApplicationDbContext _context = context;
-    private readonly UsuarioAtualService _usuarioAtualService = usuarioAtualService;
+    private readonly IUsuarioAtualService _usuarioAtualService = usuarioAtualService;
 
     public async Task<List<UsuarioDto>> BuscarUsuariosAsync()
     {
@@ -21,6 +20,7 @@ public class UsuarioService(ApplicationDbContext context, UsuarioAtualService us
                 Nome = u.Nome,
                 Email = u.Email,
                 Id = u.Id,
+                Senha = u.Senha,
             }).ToListAsync();
     }
 

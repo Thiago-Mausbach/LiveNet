@@ -12,19 +12,19 @@ public class EmpresaController(IEmpresaService service) : ControllerBase
 {
     private readonly IEmpresaService _serivce = service;
 
-    [HttpGet]
+    [HttpGet("Buscar")]
     public async Task<ActionResult<IEnumerable<EmpresaViewModel>>> GetAsync()
     {
         var ret = await _serivce.ListarEmpresasAsync();
         if (!ret.IsNullOrEmpty())
         {
-            return ret.Select(r => r.ToEmpresaDto()).ToList();
+            return ret.Select(r => r.ToEmpresaVm()).ToList();
         }
         else
             return BadRequest();
     }
 
-    [HttpPost]
+    [HttpPost("Criar")]
     public async Task<ActionResult> PostAsync(EmpresaViewModel empresa)
     {
         var model = EmpresaMapper.ToEmpresaModel(empresa);
@@ -35,7 +35,7 @@ public class EmpresaController(IEmpresaService service) : ControllerBase
             return BadRequest();
     }
 
-    [HttpPatch]
+    [HttpPatch("Editar")]
     public async Task<ActionResult> PatchAsync(Guid id, EmpresaViewModel empresa)
     {
         var model = EmpresaMapper.ToEmpresaModel(empresa);
@@ -46,7 +46,7 @@ public class EmpresaController(IEmpresaService service) : ControllerBase
             return BadRequest();
     }
 
-    [HttpDelete]
+    [HttpDelete("Deletar")]
     public async Task<ActionResult> DeleteAsync(Guid id)
     {
         var ret = await _serivce.RemoverEmpresaAsync(id);

@@ -15,17 +15,17 @@ public class ServicoController(IServicoService service) : ControllerBase
 
     private readonly IServicoService _service = service;
 
-    [HttpGet(Name = "BuscarServico")]
+    [HttpGet("Buscar")]
     public async Task<ActionResult<IEnumerable<ServicoViewModel>>> GetAsync()
     {
         var servicos = await _service.BuscarServicosAsync();
         if (!servicos.IsNullOrEmpty())
-            return servicos.Select(s => s.ToServicoDto()).ToList();
+            return servicos.Select(s => s.ToServicoVm()).ToList();
         else
             return NotFound();
     }
 
-    [HttpPost(Name = "CriarServico")]
+    [HttpPost("Criar")]
     public async Task<ActionResult> PostAsync(ServicoViewModel servico)
     {
         if (servico == null)
@@ -36,7 +36,7 @@ public class ServicoController(IServicoService service) : ControllerBase
         return Created();
     }
 
-    [HttpPatch("{id}", Name = "AtualizarServico")]
+    [HttpPatch("Editar")]
     public async Task<ActionResult> PatchAsync(ServicoViewModel servico, Guid id)
     {
         var model = ServicoMapper.ToServicoModel(servico);
@@ -47,7 +47,7 @@ public class ServicoController(IServicoService service) : ControllerBase
             return BadRequest();
     }
 
-    [HttpDelete("{id}", Name = "DeletarServico")]
+    [HttpDelete("Deletar")]
     public async Task<ActionResult> DeleteAsync(Guid id)
     {
         var retorno = await _service.DeletarServicoAsync(id);

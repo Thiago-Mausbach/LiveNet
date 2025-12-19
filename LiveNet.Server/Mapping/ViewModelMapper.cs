@@ -6,7 +6,7 @@ namespace LiveNet.Api.Mapping;
 
 public static class ViewModelMapper
 {
-    public static ContatoViewModel ToContatoDto(this ContatoModel value)
+    public static ContatoViewModel ToContatoVm(this ContatoModel value)
     {
         var result = new ContatoViewModel
         {
@@ -32,7 +32,7 @@ public static class ViewModelMapper
         return result;
     }
 
-    public static ContatoViewModel ToContatoVm(this ContatoDto value)
+    public static ContatoViewModel ContatoDtoToVm(this ContatoDto value)
     {
         var result = new ContatoViewModel
         {
@@ -58,7 +58,7 @@ public static class ViewModelMapper
         return result;
     }
 
-    public static ServicoViewModel ToServicoDto(this ServicoModel value)
+    public static ServicoViewModel ToServicoVm(this ServicoDto value)
     {
         var result = new ServicoViewModel
         {
@@ -68,7 +68,7 @@ public static class ViewModelMapper
         return result;
     }
 
-    public static UsuarioViewModel ToUsuarioDto(this UsuarioModel value)
+    public static UsuarioViewModel ToUsuarioVm(this UsuarioDto value)
     {
         var result = new UsuarioViewModel
         {
@@ -80,7 +80,7 @@ public static class ViewModelMapper
         return result;
     }
 
-    public static EmpresaViewModel ToEmpresaDto(this EmpresaModel value)
+    public static EmpresaViewModel ToEmpresaVm(this EmpresaDto value)
     {
         var result = new EmpresaViewModel
         {
@@ -91,7 +91,7 @@ public static class ViewModelMapper
         return result;
     }
 
-    public static InteresseViewModel ToInteresseDto(this InteresseModel value)
+    public static InteresseViewModel ToInteresseVm(this InteresseDto value)
     {
         var result = new InteresseViewModel
         {

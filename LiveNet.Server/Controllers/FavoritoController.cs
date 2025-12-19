@@ -12,17 +12,17 @@ public class FavoritoController(IFavoritoService favoritoService) : ControllerBa
 {
     private readonly IFavoritoService _favoritoService = favoritoService;
 
-    [HttpGet]
+    [HttpGet("Buscar")]
     public async Task<IEnumerable<ContatoViewModel>> GetAsync()
     {
         var retorno = await _favoritoService.ListarFavoritosAsync();
-        return retorno.Select(r => r.ToContatoDto()).ToList();
+        return retorno.Select(r => r.ContatoDtoToVm()).ToList();
     }
 
-    [HttpPost]
-    public async Task<ActionResult> FavoritarAsync(Guid contatoId)
+    [HttpPost("AdicionarRemover")]
+    public async Task<ActionResult> FavoritarAsync(Guid contatoId, Guid usuarioId)
     {
-        var retorno = await _favoritoService.ToggleAsync(contatoId);
+        var retorno = await _favoritoService.ToggleAsync(contatoId, usuarioId);
         if (retorno)
             return Ok("Contato adicionado aos favoritos");
         else

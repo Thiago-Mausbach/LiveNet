@@ -15,6 +15,7 @@ public static class EntityDiffValidate
         foreach (var prop in props)
         {
             if (!prop.CanWrite) continue;
+            if (prop.Name == "Id") continue;
 
             var valorOriginal = prop.GetValue(original);
             var novoValor = prop.GetValue(novo);

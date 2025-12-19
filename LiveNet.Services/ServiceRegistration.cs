@@ -1,5 +1,7 @@
-﻿using LiveNet.Services.Interfaces;
+﻿using LiveNet.Database.Context;
+using LiveNet.Services.Interfaces;
 using LiveNet.Services.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -10,9 +12,9 @@ public static class ServiceRegistration
 {
     public static IServiceCollection AddLiveNetServices(this IServiceCollection services)
     {
-        //  -------Builder para testes locais---------- -
-        //services.AddDbContext<AppDbContext>(options =>
-        //options.UseInMemoryDatabase(("DefaultConnection")));
+        //-------Builder para testes locais---------- -
+        services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseInMemoryDatabase(("DefaultConnection")));
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IContatoService, ContatoService>();

@@ -1,6 +1,4 @@
-﻿using LiveNet.Database.Context;
-using LiveNet.Services;
-using Microsoft.EntityFrameworkCore;
+﻿using LiveNet.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,8 +7,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.WebHost.UseUrls("https://localhost:7146", "http://localhost:5000");
 

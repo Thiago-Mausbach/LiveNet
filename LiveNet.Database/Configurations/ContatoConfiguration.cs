@@ -19,7 +19,7 @@ public class ContatoConfiguration : IEntityTypeConfiguration<ContatoModel>
 
         entity.HasOne(x => x.Empresa)
                .WithMany()
-               .HasForeignKey(x => x.CnpjEmpresa)
+               .HasForeignKey(x => x.Id)
                .OnDelete(DeleteBehavior.SetNull);
 
         entity.HasIndex(x => x.EmailEmpresa).IsUnique();
@@ -38,9 +38,9 @@ public class ContatoConfiguration : IEntityTypeConfiguration<ContatoModel>
    v => v
 );
 
-        entity.Property(x => x.EmailEmpresa.ToLower()).HasMaxLength(45);
+        entity.Property(x => x.EmailEmpresa).HasMaxLength(45);
 
-        entity.Property(x => x.EmailPessoal.ToLower()).HasMaxLength(45);
+        entity.Property(x => x.EmailPessoal).HasMaxLength(45);
 
         entity.Property(x => x.Telefone).HasMaxLength(11).IsFixedLength(true);
 

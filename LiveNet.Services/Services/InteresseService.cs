@@ -2,14 +2,14 @@
 using LiveNet.Domain.Models;
 using LiveNet.Services.Dtos;
 using LiveNet.Services.Interfaces;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace LiveNet.Services.Services;
 
-public class InteresseService(ApplicationDbContext context, UsuarioAtualService usuarioAtualService) : IInteresseService
+public class InteresseService(ApplicationDbContext context, IUsuarioAtualService usuarioAtualService) : IInteresseService
 {
     private readonly ApplicationDbContext _context = context;
-    private readonly UsuarioAtualService _usuarioAtualService = usuarioAtualService;
+    private readonly IUsuarioAtualService _usuarioAtualService = usuarioAtualService;
 
     public async Task<List<InteresseDto>> BuscarServicosAsync()
     {

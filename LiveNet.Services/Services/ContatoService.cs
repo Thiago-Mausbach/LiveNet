@@ -7,16 +7,16 @@ using LiveNet.Services.Dtos;
 using LiveNet.Services.Expressions;
 using LiveNet.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
 namespace LiveNet.Services.Services;
 
 public class ContatoService(ApplicationDbContext context,
-    UsuarioAtualService usuarioAtualService) : IContatoService
+    IUsuarioAtualService usuarioAtualService) : IContatoService
 {
     private readonly ApplicationDbContext _context = context;
-    private readonly UsuarioAtualService _usuarioAtualService = usuarioAtualService;
+    private readonly IUsuarioAtualService _usuarioAtualService = usuarioAtualService;
 
     public async Task<List<ContatoDto>> BuscarContatosAsync()
     {
@@ -70,6 +70,8 @@ public class ContatoService(ApplicationDbContext context,
             var duplicados = emails
                 .Where(e => existentesSet.Contains(e))
                 .ToList();
+
+            //Pensar na possiblidade de importar também Interesses e serviços (ficou muito complicado)
 
             foreach (var email in duplicados)
             {

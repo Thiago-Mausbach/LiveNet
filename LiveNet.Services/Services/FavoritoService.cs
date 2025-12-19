@@ -3,14 +3,14 @@ using LiveNet.Domain.Models;
 using LiveNet.Services.Dtos;
 using LiveNet.Services.Expressions;
 using LiveNet.Services.Interfaces;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace LiveNet.Services.Services;
 
-public class FavoritoService(ApplicationDbContext context, UsuarioAtualService usuarioAtualService) : IFavoritoService
+public class FavoritoService(ApplicationDbContext context, IUsuarioAtualService usuarioAtualService) : IFavoritoService
 {
     private readonly ApplicationDbContext _context = context;
-    private readonly UsuarioAtualService _usuarioAtualService = usuarioAtualService;
+    private readonly IUsuarioAtualService _usuarioAtualService = usuarioAtualService;
 
     public async Task<IEnumerable<ContatoDto>> ListarFavoritosAsync()
     {
@@ -20,10 +20,11 @@ public class FavoritoService(ApplicationDbContext context, UsuarioAtualService u
             .Select(ContatoExpressions.ToContatoDto).ToListAsync();
     }
 
-    public async Task<bool> ToggleAsync(Guid contatoId)
+    public async Task<bool> ToggleAsync(Guid contatoId, Guid usuarioId)
     {
-        var usuarioId = _usuarioAtualService.UsuarioId
-            ?? throw new UnauthorizedAccessException();
+
+        if (await _context.Usuarios.FindAsync(usuarioId) == null)
+            throw new UnauthorizedAccessException();
 
         var favorito = await _context.Favoritos
             .FirstOrDefaultAsync(f =>
