@@ -20,9 +20,10 @@ public class ContatoService(ApplicationDbContext context,
 
     public async Task<List<ContatoDto>> BuscarContatosAsync()
     {
-        return await _context.Contatos
-            .Select(ContatoExpressions.ToContatoDto)
-            .ToListAsync();
+        var contatos = await _context.Contatos.ToListAsync();
+
+            return contatos
+            .Select(ContatoExpressions.ToContatoDto).ToList();
 
     }
 
@@ -97,11 +98,15 @@ public class ContatoService(ApplicationDbContext context,
 
     public async Task<bool> CriarContatoManualAsync(ContatoModel contato)
     {
-        var filtro = _context.Contatos.FirstOrDefaultAsync(predicate: f => f.EmailEmpresa == contato.EmailEmpresa || f.EmailPessoal == contato.EmailPessoal);
+        var filtro = await _context.Contatos.FirstOrDefaultAsync(f =>
+    (!string.IsNullOrEmpty(contato.EmailEmpresa) && f.EmailEmpresa == contato.EmailEmpresa) ||
+    (!string.IsNullOrEmpty(contato.EmailPessoal) && f.EmailPessoal == contato.EmailPessoal)
+);
+
         if (filtro == null)
         {
-            _context.Contatos.Add(contato);
             contato.ModoInclusao = "Manual";
+            _context.Contatos.Add(contato);
             await _context.SaveChangesAsync();
             return true;
         }

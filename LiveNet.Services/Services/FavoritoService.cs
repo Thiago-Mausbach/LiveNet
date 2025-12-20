@@ -14,10 +14,13 @@ public class FavoritoService(ApplicationDbContext context, IUsuarioAtualService 
 
     public async Task<IEnumerable<ContatoDto>> ListarFavoritosAsync()
     {
-        return await _context.Favoritos
+
+        var favoritos = await _context.Favoritos
             .Where(x => x.UsuarioId == _usuarioAtualService.UsuarioId)
-            .Select(x => x.Contato)
-            .Select(ContatoExpressions.ToContatoDto).ToListAsync();
+            .Select(x => x.Contato).ToListAsync();
+
+            return favoritos
+            .Select(ContatoExpressions.ToContatoDto).ToList();
     }
 
     public async Task<bool> ToggleAsync(Guid contatoId, Guid usuarioId)
@@ -40,7 +43,6 @@ public class FavoritoService(ApplicationDbContext context, IUsuarioAtualService 
 
         _context.Favoritos.Add(new FavoritosModel
         {
-            Id = Guid.NewGuid(),
             UsuarioId = usuarioId,
             ContatoId = contatoId
         });

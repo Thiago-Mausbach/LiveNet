@@ -42,7 +42,7 @@ public class ContatoController(IContatoService contato) : ControllerBase
     [HttpPost("Adicionar")]
     public async Task<IActionResult> PostAsync(ContatoViewModel contato, Guid empresaId)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
             return BadRequest();
 
         var model = ContatoMapper.ToContatoModel(contato, empresaId);

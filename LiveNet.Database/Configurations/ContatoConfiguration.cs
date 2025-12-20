@@ -11,6 +11,8 @@ public class ContatoConfiguration : IEntityTypeConfiguration<ContatoModel>
         #region Configuração das propriedades
         entity.HasKey(x => x.Id);
 
+        entity.Property(x => x.Id).ValueGeneratedOnAdd();
+
         entity.Property(x => x.Nome)
                .IsRequired()
                .HasMaxLength(50);

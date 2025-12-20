@@ -36,6 +36,7 @@ public static class ViewModelMapper
     {
         var result = new ContatoViewModel
         {
+            Id = value.Id,
             Nome = value.Nome,
             EmailPessoal = value.EmailPessoal,
             CnpjEmpresa = value.CnpjEmpresa,
@@ -43,13 +44,13 @@ public static class ViewModelMapper
             EmailEmpresa = value.EmailEmpresa,
             Cargo = value.Cargo,
             Telefone = value.Telefone,
-            Interesses = value.Interesses.Select(i => new InteresseViewModel
+            Interesses = value.Interesses?.Select(i => new InteresseViewModel
             {
                 Id = i.Id,
                 Interesse = i.Interesse
             }).ToList(),
             ModoInclusao = value.ModoInclusao,
-            Servicos = value.Servicos.Select(s => new ServicoViewModel
+            Servicos = value.Servicos?.Select(s => new ServicoViewModel
             {
                 Id = s.Id,
                 Servico = s.Servico
