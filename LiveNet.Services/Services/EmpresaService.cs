@@ -34,29 +34,33 @@ public class EmpresaService(ApplicationDbContext context, IUsuarioAtualService u
 
     public async Task<bool> AtualizarEmpresaAsync(Guid id, EmpresaModel empresa)
     {
-        var original = await _context.Empresas.FindAsync(id);
-        if (original == null) return false;
+        var original = await _context.Empresas.FindAsync(id)
+            ?? throw new KeyNotFoundException("Empresa não encontrada");
+
+        var usuarioId = _usuarioAtualService.UsuarioId
+            ?? throw new UnauthorizedAccessException();
 
         EntityDiffValidate.ValidarDif(original, empresa);
 
         original.UpdatedAt = DateTimeOffset.Now;
-        original.UpdatedBy = _usuarioAtualService.UsuarioId;
+        original.UpdatedBy = usuarioId;
         await _context.SaveChangesAsync();
         return true;
     }
 
     public async Task<bool> RemoverEmpresaAsync(Guid id)
     {
-        var empresa = await _context.Empresas.FindAsync(id);
-        if (empresa == null)
-            return false;
-        else
-        {
-            empresa.DeletedAt = DateTimeOffset.Now;
-            empresa.DeletedBy = _usuarioAtualService.UsuarioId;
-            empresa.IsDeleted = true;
-            await _context.SaveChangesAsync();
-            return true;
-        }
+        var empresa = await _context.Empresas.FindAsync(id)
+        ?? throw new KeyNotFoundException("Empresa não encontrada");
+
+        var usuarioId = _usuarioAtualService.UsuarioId
+            ?? throw new UnauthorizedAccessException();
+
+        empresa.DeletedAt = DateTimeOffset.Now;
+        empresa.IsDeleted = true;
+        empresa.DeletedBy = usuarioId;
+
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

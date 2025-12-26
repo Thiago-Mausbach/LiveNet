@@ -1,6 +1,7 @@
 ﻿using LiveNet.Api.Mapping;
 using LiveNet.Api.ViewModels;
 using LiveNet.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
 
@@ -15,6 +16,7 @@ public class ServicoController(IServicoService service) : ControllerBase
 
     private readonly IServicoService _service = service;
 
+    [Authorize]
     [HttpGet("Buscar")]
     public async Task<ActionResult<IEnumerable<ServicoViewModel>>> GetAsync()
     {
@@ -25,6 +27,7 @@ public class ServicoController(IServicoService service) : ControllerBase
             return NotFound();
     }
 
+    [Authorize]
     [HttpPost("Criar")]
     public async Task<ActionResult> PostAsync(ServicoViewModel servico)
     {
@@ -36,6 +39,7 @@ public class ServicoController(IServicoService service) : ControllerBase
         return Created();
     }
 
+    [Authorize]
     [HttpPatch("Editar")]
     public async Task<ActionResult> PatchAsync(ServicoViewModel servico, Guid id)
     {
@@ -47,6 +51,7 @@ public class ServicoController(IServicoService service) : ControllerBase
             return BadRequest();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("Deletar")]
     public async Task<ActionResult> DeleteAsync(Guid id)
     {

@@ -29,26 +29,34 @@ public class InteresseService(ApplicationDbContext context, IUsuarioAtualService
 
     public async Task<bool> AtualizarInteresseAsync(InteresseModel interesse, Guid id)
     {
-        var filtro = await _context.Interesses.FirstOrDefaultAsync(x => x.Id == id);
-        if (filtro == null)
-            return false;
+        var filtro = await _context.Interesses.FindAsync(id)
+            ?? throw new KeyNotFoundException("Interesse não encontrado");
+
+        var usuarioId = _usuarioAtualService.UsuarioId
+          ?? throw new UnauthorizedAccessException();
 
         filtro.Interesse = interesse.Interesse;
         filtro.UpdatedAt = DateTime.Now;
-        filtro.UpdatedBy = _usuarioAtualService.UsuarioId;
+        filtro.UpdatedBy = usuarioId;
+
         await _context.SaveChangesAsync();
         return true;
     }
 
     public async Task<bool> ExcluirInteresseAsync(Guid id)
     {
-        var filtro = await _context.Interesses.FirstOrDefaultAsync(x => x.Id == id);
-        if (filtro == null)
-            return false;
+        var filtro = await _context.Interesses.FindAsync(id)
+        ?? throw new KeyNotFoundException("Interesse não encontrado");
+
+        var usuarioId = _usuarioAtualService.UsuarioId
+            ?? throw new UnauthorizedAccessException();
+
 
         filtro.IsDeleted = true;
-        filtro.DeletedBy = _usuarioAtualService.UsuarioId;
         filtro.DeletedAt = DateTimeOffset.Now;
+        filtro.DeletedBy = usuarioId;
+
+        await _context.SaveChangesAsync();
         return true;
     }
 }

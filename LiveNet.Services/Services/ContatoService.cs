@@ -98,42 +98,45 @@ public class ContatoService(ApplicationDbContext context,
     public async Task<bool> CriarContatoManualAsync(ContatoModel contato)
     {
         var filtro = _context.Contatos.FirstOrDefaultAsync(predicate: f => f.EmailEmpresa == contato.EmailEmpresa || f.EmailPessoal == contato.EmailPessoal);
-        if (filtro == null)
-        {
-            _context.Contatos.Add(contato);
-            contato.ModoInclusao = "Manual";
-            await _context.SaveChangesAsync();
-            return true;
-        }
-        else return false;
+        if (filtro != null) return false;
+
+        contato.ModoInclusao = "Manual";
+        _context.Contatos.Add(contato);
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<bool> AtualizarContatoAsync(Guid id, ContatoModel contato)
     {
-        var original = await _context.Contatos.FindAsync(id);
-        if (original == null) return false;
+        var original = await _context.Contatos.FindAsync(id)
+        ?? throw new KeyNotFoundException("Contato não encontrado");
+
+        var usuarioId = _usuarioAtualService.UsuarioId
+            ?? throw new UnauthorizedAccessException();
 
         EntityDiffValidate.ValidarDif(original, contato);
 
         original.UpdatedAt = DateTimeOffset.Now;
-        original.UpdatedBy = _usuarioAtualService.UsuarioId;
+        original.UpdatedBy = usuarioId;
+
         await _context.SaveChangesAsync();
         return true;
     }
 
     public async Task<bool> ExcluirContatoAsync(int id)
     {
-        var contatoExcluido = await _context.Contatos.FindAsync(id);
-        if (contatoExcluido != null)
-        {
-            contatoExcluido.IsDeleted = true;
-            contatoExcluido.DeletedBy = _usuarioAtualService.UsuarioId;
-            contatoExcluido.DeletedAt = DateTimeOffset.Now;
-            await _context.SaveChangesAsync();
-            return true;
-        }
-        else
-            return false;
+        var contatoExcluido = await _context.Contatos.FindAsync(id)
+        ?? throw new KeyNotFoundException("Contato não encontrado");
+
+        var usuarioId = _usuarioAtualService.UsuarioId
+            ?? throw new UnauthorizedAccessException();
+
+        contatoExcluido.IsDeleted = true;
+        contatoExcluido.DeletedBy = usuarioId;
+        contatoExcluido.DeletedAt = DateTimeOffset.Now;
+
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     private static async Task SaveFileAsync(IFormFile file)

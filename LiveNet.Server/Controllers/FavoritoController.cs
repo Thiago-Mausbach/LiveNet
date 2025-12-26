@@ -1,6 +1,7 @@
 ﻿using LiveNet.Api.Mapping;
 using LiveNet.Api.ViewModels;
 using LiveNet.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LiveNet.Api.Controllers;
@@ -12,6 +13,7 @@ public class FavoritoController(IFavoritoService favoritoService) : ControllerBa
 {
     private readonly IFavoritoService _favoritoService = favoritoService;
 
+    [Authorize]
     [HttpGet("Buscar")]
     public async Task<IEnumerable<ContatoViewModel>> GetAsync()
     {
@@ -19,6 +21,7 @@ public class FavoritoController(IFavoritoService favoritoService) : ControllerBa
         return retorno.Select(r => r.ContatoDtoToVm()).ToList();
     }
 
+    [Authorize]
     [HttpPost("AdicionarRemover")]
     public async Task<ActionResult> FavoritarAsync(Guid contatoId, Guid usuarioId)
     {

@@ -1,6 +1,7 @@
 ﻿using LiveNet.Api.Mapping;
 using LiveNet.Api.ViewModels;
 using LiveNet.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
 
@@ -12,6 +13,7 @@ public class ContatoController(IContatoService contato) : ControllerBase
 {
     private readonly IContatoService _service = contato;
 
+    [Authorize]
     [HttpGet("Buscar")]
     public async Task<ActionResult<IEnumerable<ContatoViewModel>>> GetAsync()
     {
@@ -22,6 +24,7 @@ public class ContatoController(IContatoService contato) : ControllerBase
             return BadRequest();
     }
 
+    [Authorize]
     [HttpPost("Importar")]
     public async Task<IActionResult> PostImportAsync(IFormFile file)
     {
@@ -39,6 +42,7 @@ public class ContatoController(IContatoService contato) : ControllerBase
 
     }
 
+    [Authorize]
     [HttpPost("Adicionar")]
     public async Task<IActionResult> PostAsync(ContatoViewModel contato, Guid empresaId)
     {
@@ -50,6 +54,7 @@ public class ContatoController(IContatoService contato) : ControllerBase
         return Ok();
     }
 
+    [Authorize]
     [HttpPatch("Atualizar")]
     public async Task<ActionResult> PatchAsync(Guid id, ContatoViewModel contato, Guid empresaId)
     {
@@ -64,6 +69,7 @@ public class ContatoController(IContatoService contato) : ControllerBase
             return BadRequest();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("Deletar")]
     public async Task<ActionResult> DeleteAsync(int id)
     {

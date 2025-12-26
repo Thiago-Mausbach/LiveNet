@@ -21,7 +21,6 @@ internal class ServicoService(ApplicationDbContext context, IUsuarioAtualService
                 Id = s.Id,
                 Servico = s.Servico
             }).ToListAsync();
-
     }
 
     public async Task CriarServicoAsync(ServicoModel servico)
@@ -32,25 +31,33 @@ internal class ServicoService(ApplicationDbContext context, IUsuarioAtualService
 
     public async Task<bool> AtualizarServicoAsync(ServicoModel servico, Guid id)
     {
-        var original = await _context.Servicos.FindAsync(id);
-        if (original == null) return false;
+        var original = await _context.Servicos.FindAsync(id)
+         ?? throw new KeyNotFoundException("Serviço não encontrado");
+
+        var usuarioId = _usuarioAtualService.UsuarioId
+    ?? throw new UnauthorizedAccessException();
 
         EntityDiffValidate.ValidarDif(original, servico);
 
         original.UpdatedAt = DateTimeOffset.Now;
-        original.UpdatedBy = _usuarioAtualService.UsuarioId;
+        original.UpdatedBy = usuarioId;
+
         await _context.SaveChangesAsync();
         return true;
     }
 
     public async Task<bool> DeletarServicoAsync(Guid id)
     {
-        var servico = await _context.Servicos.FindAsync(id);
-        if (servico == null) return false;
+        var servico = await _context.Servicos.FindAsync(id)
+        ?? throw new KeyNotFoundException("Serviço não encontrado");
+
+        var usuarioId = _usuarioAtualService.UsuarioId
+            ?? throw new UnauthorizedAccessException();
 
         servico.IsDeleted = true;
         servico.DeletedAt = DateTime.Now;
-        servico.DeletedBy = _usuarioAtualService.UsuarioId;
+        servico.DeletedBy = usuarioId;
+
         await _context.SaveChangesAsync();
         return true;
     }

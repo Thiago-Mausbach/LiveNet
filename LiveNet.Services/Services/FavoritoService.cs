@@ -23,12 +23,12 @@ public class FavoritoService(ApplicationDbContext context, IUsuarioAtualService 
     public async Task<bool> ToggleAsync(Guid contatoId, Guid usuarioId)
     {
 
-        if (await _context.Usuarios.FindAsync(usuarioId) == null)
-            throw new UnauthorizedAccessException();
+        var usuarioAtual = await _context.Usuarios.FindAsync(usuarioId)
+            ?? throw new UnauthorizedAccessException();
 
         var favorito = await _context.Favoritos
             .FirstOrDefaultAsync(f =>
-                f.UsuarioId == usuarioId &&
+                f.UsuarioId == usuarioAtual.Id &&
                 f.ContatoId == contatoId);
 
         if (favorito != null)

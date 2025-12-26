@@ -1,6 +1,7 @@
 ﻿using LiveNet.Api.Mapping;
 using LiveNet.Api.ViewModels;
 using LiveNet.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LiveNet.Api.Controllers;
@@ -11,6 +12,7 @@ public class InteresseController(IInteresseService service) : ControllerBase
 {
     private readonly IInteresseService _service = service;
 
+    [Authorize]
     [HttpGet("Buscar")]
     public async Task<IEnumerable<InteresseViewModel>> GetAsync()
     {
@@ -18,6 +20,7 @@ public class InteresseController(IInteresseService service) : ControllerBase
         return interesses.Select(i => i.ToInteresseVm()).ToList();
     }
 
+    [Authorize]
     [HttpPost("Criar")]
     public async Task<ActionResult> PostAsync(InteresseViewModel interesseViewModel)
     {
@@ -31,6 +34,7 @@ public class InteresseController(IInteresseService service) : ControllerBase
             return BadRequest();
     }
 
+    [Authorize]
     [HttpPatch("Editar")]
     public async Task<ActionResult> PatchAsync(InteresseViewModel interesseViewModel, Guid id)
     {
@@ -43,6 +47,7 @@ public class InteresseController(IInteresseService service) : ControllerBase
         return BadRequest();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("Deletar")]
     public async Task<ActionResult> DeleteAsync(Guid id)
     {

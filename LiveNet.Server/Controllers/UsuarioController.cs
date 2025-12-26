@@ -1,6 +1,7 @@
 ﻿using LiveNet.Api.Mapping;
 using LiveNet.Api.ViewModels;
 using LiveNet.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
 
@@ -14,6 +15,7 @@ public class UsuarioController(IUsuarioService service) : ControllerBase
 
     private readonly IUsuarioService _service = service;
 
+    [Authorize]
     [HttpGet("Buscar")]
     public async Task<ActionResult<IEnumerable<UsuarioViewModel>>> GetAsync()
     {
@@ -24,6 +26,7 @@ public class UsuarioController(IUsuarioService service) : ControllerBase
             return NotFound("Nenhum usuário");
     }
 
+    [Authorize]
     [HttpPost("Criar")]
     public async Task<ActionResult> PostAsync(UsuarioViewModel usuario)
     {
@@ -36,6 +39,8 @@ public class UsuarioController(IUsuarioService service) : ControllerBase
         else
             return BadRequest();
     }
+
+    [Authorize]
     [HttpPatch("Editar")]
     public async Task<ActionResult> PatchAsync(UsuarioViewModel usuario, Guid id)
     {
@@ -52,6 +57,7 @@ public class UsuarioController(IUsuarioService service) : ControllerBase
             return BadRequest();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("Deletar")]
     public async Task<ActionResult> DeleteAsync(Guid id)
     {

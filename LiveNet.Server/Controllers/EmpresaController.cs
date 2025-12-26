@@ -1,6 +1,7 @@
 ﻿using LiveNet.Api.Mapping;
 using LiveNet.Api.ViewModels;
 using LiveNet.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
 
@@ -12,6 +13,7 @@ public class EmpresaController(IEmpresaService service) : ControllerBase
 {
     private readonly IEmpresaService _serivce = service;
 
+    [Authorize]
     [HttpGet("Buscar")]
     public async Task<ActionResult<IEnumerable<EmpresaViewModel>>> GetAsync()
     {
@@ -24,6 +26,7 @@ public class EmpresaController(IEmpresaService service) : ControllerBase
             return BadRequest();
     }
 
+    [Authorize]
     [HttpPost("Criar")]
     public async Task<ActionResult> PostAsync(EmpresaViewModel empresa)
     {
@@ -35,6 +38,7 @@ public class EmpresaController(IEmpresaService service) : ControllerBase
             return BadRequest();
     }
 
+    [Authorize]
     [HttpPatch("Editar")]
     public async Task<ActionResult> PatchAsync(Guid id, EmpresaViewModel empresa)
     {
@@ -46,6 +50,7 @@ public class EmpresaController(IEmpresaService service) : ControllerBase
             return BadRequest();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("Deletar")]
     public async Task<ActionResult> DeleteAsync(Guid id)
     {

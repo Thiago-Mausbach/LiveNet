@@ -3,14 +3,16 @@ using LiveNet.Domain.Models;
 using LiveNet.Infrastructure;
 using LiveNet.Services.Dtos;
 using LiveNet.Services.Interfaces;
+using Microsoft.AspNet.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace LiveNet.Services.Services;
 
-public class UsuarioService(ApplicationDbContext context, IUsuarioAtualService usuarioAtualService) : IUsuarioService
+public class UsuarioService(ApplicationDbContext context, IUsuarioAtualService usuarioAtualService, PasswordHasher hasher) : IUsuarioService
 {
     private readonly ApplicationDbContext _context = context;
     private readonly IUsuarioAtualService _usuarioAtualService = usuarioAtualService;
+    private readonly PasswordHasher _hasher = hasher;
 
     public async Task<List<UsuarioDto>> BuscarUsuariosAsync()
     {
@@ -26,37 +28,40 @@ public class UsuarioService(ApplicationDbContext context, IUsuarioAtualService u
 
     public async Task CriarUsuarioAsync(UsuarioModel usuario)
     {
+        usuario.Senha = _hasher.HashPassword(usuario.Senha);
         _context.Add(usuario);
         await _context.SaveChangesAsync();
     }
 
     public async Task<bool> EditarUsuarioAsync(UsuarioModel usuario, Guid id)
     {
-        var original = await _context.Usuarios.FindAsync(id);
-        if (original == null) return false;
+        var original = await _context.Usuarios.FindAsync(id)
+        ?? throw new KeyNotFoundException("Usuario não encontrado");
+
+        var usuarioId = _usuarioAtualService.UsuarioId
+            ?? throw new UnauthorizedAccessException();
 
         EntityDiffValidate.ValidarDif(original, usuario);
 
         original.UpdatedAt = DateTimeOffset.Now;
-        original.UpdatedBy = _usuarioAtualService.UsuarioId;
+        original.UpdatedBy = usuarioId;
+
         await _context.SaveChangesAsync();
         return true;
     }
 
     public async Task<bool> DeletarUsuariosAsync(Guid id)
     {
-        var servico = await _context.Usuarios.FirstOrDefaultAsync(x => x.Id == id);
-        if (servico != null)
-        {
-            servico.IsDeleted = true;
-            servico.DeletedAt = DateTime.Now;
-            servico.DeletedBy = _usuarioAtualService.UsuarioId;
-            await _context.SaveChangesAsync();
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        var servico = await _context.Usuarios.FindAsync(id)
+        ?? throw new KeyNotFoundException("Uusario não encontrado");
+
+        var usuarioId = _usuarioAtualService.UsuarioId
+            ?? throw new UnauthorizedAccessException();
+
+        servico.IsDeleted = true;
+        servico.DeletedAt = DateTime.Now;
+        servico.DeletedBy = usuarioId;
+        await _context.SaveChangesAsync();
+        return true;
     }
 }
