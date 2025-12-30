@@ -3,16 +3,16 @@ using LiveNet.Domain.Models;
 using LiveNet.Infrastructure;
 using LiveNet.Services.Dtos;
 using LiveNet.Services.Interfaces;
-using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace LiveNet.Services.Services;
 
-public class UsuarioService(ApplicationDbContext context, IUsuarioAtualService usuarioAtualService, PasswordHasher hasher) : IUsuarioService
+public class UsuarioService(ApplicationDbContext context, IUsuarioAtualService usuarioAtualService, IPasswordHasher<UsuarioModel> hasher) : IUsuarioService
 {
     private readonly ApplicationDbContext _context = context;
     private readonly IUsuarioAtualService _usuarioAtualService = usuarioAtualService;
-    private readonly PasswordHasher _hasher = hasher;
+    private readonly IPasswordHasher<UsuarioModel> _hasher = hasher;
 
     public async Task<List<UsuarioDto>> BuscarUsuariosAsync()
     {
@@ -28,7 +28,7 @@ public class UsuarioService(ApplicationDbContext context, IUsuarioAtualService u
 
     public async Task CriarUsuarioAsync(UsuarioModel usuario)
     {
-        usuario.Senha = _hasher.HashPassword(usuario.Senha);
+        usuario.Senha = _hasher.HashPassword(usuario, usuario.Senha);
         _context.Add(usuario);
         await _context.SaveChangesAsync();
     }

@@ -1,6 +1,8 @@
 ﻿using LiveNet.Database.Context;
+using LiveNet.Domain.Models;
 using LiveNet.Services.Interfaces;
 using LiveNet.Services.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,6 +26,8 @@ public static class ServiceRegistration
         services.AddScoped<IServicoService, ServicoService>();
         services.AddScoped<IUsuarioAtualService, UsuarioAtualService>();
         services.AddScoped<IUsuarioService, UsuarioService>();
+        services.AddScoped<IPasswordHasher<UsuarioModel>, PasswordHasher<UsuarioModel>>();
+
 
         services.AddHttpContextAccessor();
 
