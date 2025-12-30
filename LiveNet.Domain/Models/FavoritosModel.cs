@@ -2,7 +2,6 @@
 
 public class FavoritosModel
 {
-    public Guid Id { get; set; }
     public Guid UsuarioId { get; set; }
     public Guid ContatoId { get; set; }
     public UsuarioModel Usuario { get; set; } = null!;

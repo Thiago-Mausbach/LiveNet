@@ -20,9 +20,10 @@ public class ContatoService(ApplicationDbContext context,
 
     public async Task<List<ContatoDto>> BuscarContatosAsync()
     {
-        return await _context.Contatos
-            .Select(ContatoExpressions.ToContatoDto)
-            .ToListAsync();
+        var contatos = await _context.Contatos.ToListAsync();
+
+            return contatos
+            .Select(ContatoExpressions.ToContatoDto).ToList();
 
     }
 
