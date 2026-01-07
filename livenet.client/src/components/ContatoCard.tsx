@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+ï»¿import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import FavoritoToggle from "./FavoritoToggle";
 import { Contato } from "@/api/contatos";
 
@@ -24,7 +24,7 @@ export default function ContatoCard({ contato, onToggleFavorito }: Props) {
             </CardHeader>
 
             <CardContent>
-                {/* espaço futuro: telefone, tags, ações */}
+                {/* espaÃ§o futuro: telefone, tags, aÃ§Ãµes */}
             </CardContent>
         </Card>
     );

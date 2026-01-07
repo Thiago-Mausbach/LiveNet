@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Contatos from "../pages/Contatos";
+﻿import { Routes, Route, Navigate } from "react-router-dom";
+import Contatos from "../pages/contatos";
 import Favoritos from "../pages/favoritos";
 import Conta from "../pages/conta";
 import * as React from "react";

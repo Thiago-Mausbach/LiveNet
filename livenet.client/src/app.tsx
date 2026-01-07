@@ -1,8 +1,18 @@
-import * as React from "react";
-import AppRoutes from "./routes/appRoutes";
+﻿import { Routes, Route, Navigate } from "react-router-dom";
+import AppLayout from "@/components/layouts/appLayout";
+import Contatos from "@/pages/contatos";
+import Favoritos from "@/pages/favoritos";
+import Conta from "@/pages/conta";
 
-function App() {
-    return <AppRoutes />;
+export default function App() {
+    return (
+        <AppLayout>
+            <Routes>
+                <Route path="/" element={<Navigate to="/contatos" />} />
+                <Route path="/contatos" element={<Contatos />} />
+                <Route path="/favoritos" element={<Favoritos />} />
+                <Route path="/conta" element={<Conta />} />
+            </Routes>
+        </AppLayout>
+    );
 }
-
-export default App;

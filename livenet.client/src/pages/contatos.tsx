@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { getContatos, Contato } from "../api/contatos";
 import FavoritoToggle from "../components/FavoritoToggle";
 
@@ -30,7 +30,9 @@ export default function Contatos() {
                     {/* ? TOGGLE DE FAVORITO */}
                     <FavoritoToggle
                         contatoId={c.id}
-                        /* 
+                        favorito={ c.isFavorito}
+                        /*
+                        
                           Se no futuro o backend mandar `ehFavorito`,
                           basta trocar para:
                           favoritoInicial={c.ehFavorito}

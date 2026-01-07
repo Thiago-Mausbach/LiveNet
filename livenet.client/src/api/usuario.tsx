@@ -1,17 +1,14 @@
-import { api } from "./api";
+ï»¿import { api } from "./api";
+import { Usuario } from "@/types/usuario";
 
-export type Usuario = {
-    id: string;
-    nome: string;
-    email: string;
-};
-
-/* Dados do usuário logado */
-export function getMinhaConta() {
+export function getUsuarioLogado() {
     return api.get<Usuario>("/usuarios/me");
 }
 
-/* Atualizar dados da conta */
-export function atualizarConta(dados: Partial<Usuario>) {
+export function atualizarUsuario(dados: Pick<Usuario, "nome" | "email">) {
     return api.put("/usuarios/me", dados);
+}
+
+export function redefinirSenha(senha: string) {
+    return api.put("/usuarios/me/senha", { senha });
 }
