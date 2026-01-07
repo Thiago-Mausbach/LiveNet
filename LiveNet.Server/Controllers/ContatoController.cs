@@ -9,15 +9,17 @@ namespace LiveNet.Api.Controllers;
 
 [Route("Api/[controller]")]
 [ApiController]
-public class ContatoController(IContatoService contato) : ControllerBase
+public class ContatoController(IContatoService contato, IUsuarioAtualService usuario) : ControllerBase
 {
     private readonly IContatoService _service = contato;
+    private readonly IUsuarioAtualService _usuarioAtualService = usuario;
 
     [Authorize]
     [HttpGet("Buscar")]
     public async Task<ActionResult<IEnumerable<ContatoViewModel>>> GetAsync()
     {
-        var contatos = await _service.BuscarContatosAsync();
+        var usuarioId = _usuarioAtualService.UsuarioId;
+        var contatos = await _service.BuscarContatosAsync(usuarioId);
         if (!contatos.IsNullOrEmpty())
             return contatos.Select(c => c.ContatoDtoToVm()).ToList();
         else

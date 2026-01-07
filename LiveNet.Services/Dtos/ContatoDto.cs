@@ -12,6 +12,7 @@ public class ContatoDto
     public string? CnpjEmpresa { get; set; }
     public string? Cargo { get; set; }
     public bool Cliente { get; set; }
+    public bool IsFavorito { get; set; }
     public ICollection<InteresseDto>? Interesses { get; set; }
     public string? ModoInclusao { get; set; }
     public ICollection<ServicoDto>? Servicos { get; set; }

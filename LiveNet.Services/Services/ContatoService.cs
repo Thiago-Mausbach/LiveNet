@@ -18,13 +18,24 @@ public class ContatoService(ApplicationDbContext context,
     private readonly ApplicationDbContext _context = context;
     private readonly IUsuarioAtualService _usuarioAtualService = usuarioAtualService;
 
-    public async Task<List<ContatoDto>> BuscarContatosAsync()
+    public async Task<List<ContatoDto>> BuscarContatosAsync(Guid? usuarioId)
     {
-        var contatos = await _context.Contatos.ToListAsync();
+        var contatos = await _context.Contatos
+            .AsNoTracking()
+            .ToListAsync();
 
-            return contatos
-            .Select(ContatoExpressions.ToContatoDto).ToList();
+        var favoritosIds = await _context.Favoritos
+            .Where(f => f.UsuarioId == usuarioId)
+            .Select(f => f.ContatoId)
+            .ToListAsync();
 
+        return contatos.Select(c => new ContatoDto
+        {
+            Id = c.Id,
+            Nome = c.Nome,
+            EmailEmpresa = c.EmailEmpresa,
+            IsFavorito = favoritosIds.Contains(c.Id)
+        }).ToList();
     }
 
     public async Task<ImportacaoContatoDto> UploadListaAsync(IFormFile file)

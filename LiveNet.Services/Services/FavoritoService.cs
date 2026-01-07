@@ -16,7 +16,7 @@ public class FavoritoService(ApplicationDbContext context, IUsuarioAtualService 
     {
 
         var favoritos = await _context.Favoritos
-            .Where(x => x.UsuarioId == _usuarioAtualService.UsuarioId)
+            .Where(x => x.UsuarioId == _usuarioAtualService.UsuarioId   )
             .Select(x => x.Contato).ToListAsync();
 
             return favoritos
@@ -26,12 +26,12 @@ public class FavoritoService(ApplicationDbContext context, IUsuarioAtualService 
     public async Task<bool> ToggleAsync(Guid contatoId, Guid usuarioId)
     {
 
-        var usuarioAtual = await _context.Usuarios.FindAsync(usuarioId)
-            ?? throw new UnauthorizedAccessException();
+        if (await _context.Usuarios.FindAsync(usuarioId) == null)
+            throw new UnauthorizedAccessException();
 
         var favorito = await _context.Favoritos
             .FirstOrDefaultAsync(f =>
-                f.UsuarioId == usuarioAtual.Id &&
+                f.UsuarioId == usuarioId &&
                 f.ContatoId == contatoId);
 
         if (favorito != null)

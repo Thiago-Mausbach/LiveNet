@@ -6,7 +6,7 @@ namespace LiveNet.Services.Interfaces;
 
 public interface IContatoService
 {
-    Task<List<ContatoDto>> BuscarContatosAsync();
+    Task<List<ContatoDto>> BuscarContatosAsync(Guid? usuarioId);
     Task<ImportacaoContatoDto> UploadListaAsync(IFormFile file);
     Task<bool> CriarContatoManualAsync(ContatoModel contato);
     Task<bool> AtualizarContatoAsync(Guid id, ContatoModel contato);
