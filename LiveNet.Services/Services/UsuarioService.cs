@@ -34,13 +34,19 @@ public class UsuarioService( ApplicationDbContext context, IUsuarioAtualService 
             throw new UnauthorizedAccessException();
     }
 
-    public async Task CriarUsuarioAsync( UsuarioDto usuario )
+    public async Task<UsuarioResponseDto> CriarUsuarioAsync( UsuarioDto usuario )
     {
         var usuarioM = _mapper.Map<UsuarioModel>( usuario );
 
         usuario.Senha = _hasher.HashPassword( usuarioM, usuarioM.Senha );
         _context.Add( usuarioM );
         await _context.SaveChangesAsync();
+
+        return new UsuarioResponseDto
+        {
+            Id = usuarioM.Id,
+            Nome = usuarioM.Nome
+        };
     }
 
     public async Task<bool> EditarUsuarioAsync( UsuarioDto usuario, Guid id )

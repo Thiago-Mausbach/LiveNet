@@ -27,12 +27,13 @@ public class UsuarioController( IUsuarioService service ) : ControllerBase
 
     [Authorize]
     [HttpPost( "Criar" )]
-    public async Task<ActionResult> PostAsync( UsuarioDto usuario )
+    public async Task<ActionResult<UsuarioResponseDto>> PostAsync( UsuarioDto usuario )
     {
         if ( ModelState.IsValid )
         {
             await _service.CriarUsuarioAsync( usuario );
-            return Created();
+            return CreatedAtAction(
+    nameof( usuario.Id ), new { id = usuario.Id } );
         }
         else
             return BadRequest();
