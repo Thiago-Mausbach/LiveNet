@@ -1,4 +1,5 @@
-﻿using LiveNet.Database.Context;
+﻿using AutoMapper;
+using LiveNet.Database.Context;
 using LiveNet.Domain.Models;
 using LiveNet.Infrastructure;
 using LiveNet.Services.Dtos;
@@ -8,52 +9,69 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LiveNet.Services.Services;
 
-public class UsuarioService(ApplicationDbContext context, IUsuarioAtualService usuarioAtualService, IPasswordHasher<UsuarioModel> hasher) : IUsuarioService
+public class UsuarioService( ApplicationDbContext context, IUsuarioAtualService usuarioAtualService, IPasswordHasher<UsuarioModel> hasher, IMapper mapper ) : IUsuarioService
 {
     private readonly ApplicationDbContext _context = context;
     private readonly IUsuarioAtualService _usuarioAtualService = usuarioAtualService;
     private readonly IPasswordHasher<UsuarioModel> _hasher = hasher;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<List<UsuarioDto>> BuscarUsuariosAsync()
     {
-        return await _context.Usuarios
-            .Select(u => new UsuarioDto
-            {
-                Nome = u.Nome,
-                Email = u.Email,
-                Id = u.Id,
-                Senha = u.Senha,
-            }).ToListAsync();
+        var ehAdmin = await _context.Usuarios.FirstAsync( x => x.Id == _usuarioAtualService.UsuarioId );
+        if ( ehAdmin.IsAdmin )
+        {
+            return await _context.Usuarios
+                .Select( u => new UsuarioDto
+                {
+                    Nome = u.Nome,
+                    Email = u.Email,
+                    Id = u.Id,
+                    Senha = u.Senha,
+                } ).ToListAsync();
+        }
+        else
+            throw new UnauthorizedAccessException();
     }
 
-    public async Task CriarUsuarioAsync(UsuarioModel usuario)
+    public async Task CriarUsuarioAsync( UsuarioDto usuario )
     {
-        usuario.Senha = _hasher.HashPassword(usuario, usuario.Senha);
-        _context.Add(usuario);
+        var usuarioM = _mapper.Map<UsuarioModel>( usuario );
+
+        usuario.Senha = _hasher.HashPassword( usuarioM, usuarioM.Senha );
+        _context.Add( usuarioM );
         await _context.SaveChangesAsync();
     }
 
-    public async Task<bool> EditarUsuarioAsync(UsuarioModel usuario, Guid id)
+    public async Task<bool> EditarUsuarioAsync( UsuarioDto usuario, Guid id )
     {
-        var original = await _context.Usuarios.FindAsync(id)
-        ?? throw new KeyNotFoundException("Usuario não encontrado");
+        var original = await _context.Usuarios.FindAsync( id )
+        ?? throw new KeyNotFoundException( "Usuario não encontrado" );
 
         var usuarioId = _usuarioAtualService.UsuarioId
             ?? throw new UnauthorizedAccessException();
 
-        EntityDiffValidate.ValidarDif(original, usuario);
+        var usuarioAtual = await _context.Usuarios.FirstAsync( x => x.Id == usuarioId );
 
-        original.UpdatedAt = DateTimeOffset.Now;
-        original.UpdatedBy = usuarioId;
+        if ( original.Id == _usuarioAtualService.UsuarioId || usuarioAtual.IsAdmin )
+        {
+            var usuarioM = _mapper.Map<UsuarioModel>( usuario );
+            EntityDiffValidate.ValidarDif( original, usuarioM );
 
-        await _context.SaveChangesAsync();
-        return true;
+            original.UpdatedAt = DateTimeOffset.Now;
+            original.UpdatedBy = usuarioId;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        else
+            throw new UnauthorizedAccessException();
     }
 
-    public async Task<bool> DeletarUsuariosAsync(Guid id)
+    public async Task<bool> DeletarUsuariosAsync( Guid id )
     {
-        var servico = await _context.Usuarios.FindAsync(id)
-        ?? throw new KeyNotFoundException("Uusario não encontrado");
+        var servico = await _context.Usuarios.FindAsync( id )
+        ?? throw new KeyNotFoundException( "Uusario não encontrado" );
 
         var usuarioId = _usuarioAtualService.UsuarioId
             ?? throw new UnauthorizedAccessException();

@@ -1,58 +1,39 @@
-﻿import {
-    createContext,
-    useContext,
-    useEffect,
-    useState,
-} from "react";
-import { Usuario } from "@/types/usuario";
-import { getUsuarioLogado } from "@/api/usuario";
+﻿import { createContext, useContext, useState } from "react";
 
-interface AuthContextData {
+type Usuario = {
+    id: string;
+    nome: string;
+    email: string;
+};
+
+type AuthContextType = {
     usuario: Usuario | null;
-    setUsuario: (usuario: Usuario | null) => void;
-
-    // ➕ novos (não quebram nada)
-    loading: boolean;
+    login: (usuario: Usuario) => void;
     logout: () => void;
-}
+};
 
-const AuthContext = createContext<AuthContextData>(
-    {} as AuthContextData
-);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [usuario, setUsuario] = useState<Usuario | null>(null);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        getUsuarioLogado()
-            .then(res => setUsuario(res.data))
-            .catch(() => setUsuario(null))
-            .finally(() => setLoading(false));
-    }, []);
+    function login(usuario: Usuario) {
+        setUsuario(usuario);
+    }
 
     function logout() {
         setUsuario(null);
-        // futuro: api.post("/auth/logout")
     }
 
     return (
-        <AuthContext.Provider
-            value={{ usuario, setUsuario, loading, logout }}
-        >
+        <AuthContext.Provider value={{ usuario, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
 }
 
-// 🔹 mantém compatibilidade
 export function useAuth() {
-    return useContext(AuthContext);
+    const ctx = useContext(AuthContext);
+    if (!ctx) throw new Error("useAuth deve estar dentro de AuthProvider");
+    return ctx;
 }
-
-// 🔹 opcional: mantém export antigo
-export { AuthContext };

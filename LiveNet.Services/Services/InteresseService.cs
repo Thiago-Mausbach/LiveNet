@@ -1,4 +1,5 @@
-﻿using LiveNet.Database.Context;
+﻿using AutoMapper;
+using LiveNet.Database.Context;
 using LiveNet.Domain.Models;
 using LiveNet.Services.Dtos;
 using LiveNet.Services.Interfaces;
@@ -6,31 +7,34 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LiveNet.Services.Services;
 
-public class InteresseService(ApplicationDbContext context, IUsuarioAtualService usuarioAtualService) : IInteresseService
+public class InteresseService( ApplicationDbContext context, IUsuarioAtualService usuarioAtualService, IMapper mapper ) : IInteresseService
 {
     private readonly ApplicationDbContext _context = context;
     private readonly IUsuarioAtualService _usuarioAtualService = usuarioAtualService;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<List<InteresseDto>> BuscarServicosAsync()
     {
         return await _context.Interesses.AsNoTracking()
-            .Select(i => new InteresseDto
+            .Select( i => new InteresseDto
             {
                 Id = i.Id,
                 Interesse = i.Interesse
-            }).ToListAsync();
+            } ).ToListAsync();
     }
 
-    public async Task CriarServicosAsync(InteresseModel interesse)
+    public async Task CriarInteresseAsync( InteresseDto interesse )
     {
-        _context.Interesses.Add(interesse);
+        var interesseM = _mapper.Map<InteresseModel>( interesse );
+
+        _context.Interesses.Add( interesseM );
         await _context.SaveChangesAsync();
     }
 
-    public async Task<bool> AtualizarInteresseAsync(InteresseModel interesse, Guid id)
+    public async Task<bool> AtualizarInteresseAsync( InteresseDto interesse, Guid id )
     {
-        var filtro = await _context.Interesses.FindAsync(id)
-            ?? throw new KeyNotFoundException("Interesse não encontrado");
+        var filtro = await _context.Interesses.FindAsync( id )
+            ?? throw new KeyNotFoundException( "Interesse não encontrado" );
 
         var usuarioId = _usuarioAtualService.UsuarioId
           ?? throw new UnauthorizedAccessException();
@@ -43,10 +47,10 @@ public class InteresseService(ApplicationDbContext context, IUsuarioAtualService
         return true;
     }
 
-    public async Task<bool> ExcluirInteresseAsync(Guid id)
+    public async Task<bool> ExcluirInteresseAsync( Guid id )
     {
-        var filtro = await _context.Interesses.FindAsync(id)
-        ?? throw new KeyNotFoundException("Interesse não encontrado");
+        var filtro = await _context.Interesses.FindAsync( id )
+        ?? throw new KeyNotFoundException( "Interesse não encontrado" );
 
         var usuarioId = _usuarioAtualService.UsuarioId
             ?? throw new UnauthorizedAccessException();

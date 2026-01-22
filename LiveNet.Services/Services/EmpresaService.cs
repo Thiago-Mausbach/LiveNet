@@ -1,4 +1,5 @@
-﻿using LiveNet.Database.Context;
+﻿using AutoMapper;
+using LiveNet.Database.Context;
 using LiveNet.Domain.Models;
 using LiveNet.Infrastructure;
 using LiveNet.Services.Dtos;
@@ -7,40 +8,45 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LiveNet.Services.Services;
 
-public class EmpresaService(ApplicationDbContext context, IUsuarioAtualService usuarioAtualService) : IEmpresaService
+public class EmpresaService( ApplicationDbContext context, IUsuarioAtualService usuarioAtualService, IMapper mapper ) : IEmpresaService
 {
     private readonly ApplicationDbContext _context = context;
     private readonly IUsuarioAtualService _usuarioAtualService = usuarioAtualService;
+    private readonly IMapper _mapper = mapper;
     public async Task<List<EmpresaDto>> ListarEmpresasAsync()
     {
         return await _context.Empresas
-            .AsNoTracking().Select(e => new EmpresaDto
+            .AsNoTracking().Select( e => new EmpresaDto
             {
                 Id = e.Id,
                 Cnpj = e.Cnpj,
                 RazaoSocial = e.RazaoSocial,
-            }).ToListAsync();
+            } ).ToListAsync();
     }
 
-    public async Task<bool> CriarEmpresaAsync(EmpresaModel empresa)
+    public async Task<bool> CriarEmpresaAsync( EmpresaDto empresa )
     {
-        _context.Empresas.Add(empresa);
+        var empresaM = _mapper.Map<EmpresaModel>( empresa );
+
+        _context.Empresas.Add( empresaM );
         var ret = await _context.SaveChangesAsync();
-        if (ret > 0)
+        if ( ret > 0 )
             return true;
         else
             return false;
     }
 
-    public async Task<bool> AtualizarEmpresaAsync(Guid id, EmpresaModel empresa)
+    public async Task<bool> AtualizarEmpresaAsync( Guid id, EmpresaDto empresa )
     {
-        var original = await _context.Empresas.FindAsync(id)
-            ?? throw new KeyNotFoundException("Empresa não encontrada");
+        var original = await _context.Empresas.FindAsync( id )
+            ?? throw new KeyNotFoundException( "Empresa não encontrada" );
 
         var usuarioId = _usuarioAtualService.UsuarioId
             ?? throw new UnauthorizedAccessException();
 
-        EntityDiffValidate.ValidarDif(original, empresa);
+        var empresaM = _mapper.Map<EmpresaModel>( empresa );
+
+        EntityDiffValidate.ValidarDif( original, empresaM );
 
         original.UpdatedAt = DateTimeOffset.Now;
         original.UpdatedBy = usuarioId;
@@ -48,10 +54,10 @@ public class EmpresaService(ApplicationDbContext context, IUsuarioAtualService u
         return true;
     }
 
-    public async Task<bool> RemoverEmpresaAsync(Guid id)
+    public async Task<bool> RemoverEmpresaAsync( Guid id )
     {
-        var empresa = await _context.Empresas.FindAsync(id)
-        ?? throw new KeyNotFoundException("Empresa não encontrada");
+        var empresa = await _context.Empresas.FindAsync( id )
+        ?? throw new KeyNotFoundException( "Empresa não encontrada" );
 
         var usuarioId = _usuarioAtualService.UsuarioId
             ?? throw new UnauthorizedAccessException();

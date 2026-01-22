@@ -1,5 +1,4 @@
-﻿using LiveNet.Api.Mapping;
-using LiveNet.Api.ViewModels;
+﻿using LiveNet.Services.Dtos;
 using LiveNet.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,54 +8,52 @@ namespace LiveNet.Api.Controllers;
 
 
 [ApiController]
-[Route("Api/[Controller]")]
+[Route( "Api/[Controller]" )]
 
-public class ServicoController(IServicoService service) : ControllerBase
+public class ServicoController( IServicoService service ) : ControllerBase
 {
 
     private readonly IServicoService _service = service;
 
     [Authorize]
-    [HttpGet("Buscar")]
-    public async Task<ActionResult<IEnumerable<ServicoViewModel>>> GetAsync()
+    [HttpGet( "Buscar" )]
+    public async Task<ActionResult<IEnumerable<ServicoDto>>> GetAsync()
     {
         var servicos = await _service.BuscarServicosAsync();
-        if (!servicos.IsNullOrEmpty())
-            return servicos.Select(s => s.ToServicoVm()).ToList();
+        if ( !servicos.IsNullOrEmpty() )
+            return servicos;
         else
             return NotFound();
     }
 
     [Authorize]
-    [HttpPost("Criar")]
-    public async Task<ActionResult> PostAsync(ServicoViewModel servico)
+    [HttpPost( "Criar" )]
+    public async Task<ActionResult> PostAsync( ServicoDto servico )
     {
-        if (servico == null)
+        if ( servico == null )
             return BadRequest();
 
-        var model = ServicoMapper.ToServicoModel(servico);
-        await _service.CriarServicoAsync(model);
+        await _service.CriarServicoAsync( servico );
         return Created();
     }
 
     [Authorize]
-    [HttpPatch("Editar")]
-    public async Task<ActionResult> PatchAsync(ServicoViewModel servico, Guid id)
+    [HttpPatch( "Editar" )]
+    public async Task<ActionResult> PatchAsync( ServicoDto servico, Guid id )
     {
-        var model = ServicoMapper.ToServicoModel(servico);
-        var retorno = await _service.AtualizarServicoAsync(model, id);
-        if (retorno)
+        var retorno = await _service.AtualizarServicoAsync( servico, id );
+        if ( retorno )
             return Ok();
         else
             return BadRequest();
     }
 
-    [Authorize(Roles = "Admin")]
-    [HttpDelete("Deletar")]
-    public async Task<ActionResult> DeleteAsync(Guid id)
+    [Authorize( Roles = "Admin" )]
+    [HttpDelete( "Deletar" )]
+    public async Task<ActionResult> DeleteAsync( Guid id )
     {
-        var retorno = await _service.DeletarServicoAsync(id);
-        if (retorno)
+        var retorno = await _service.DeletarServicoAsync( id );
+        if ( retorno )
             return Ok();
 
         return BadRequest();

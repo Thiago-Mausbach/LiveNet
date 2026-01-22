@@ -1,5 +1,4 @@
-﻿using LiveNet.Api.Mapping;
-using LiveNet.Api.ViewModels;
+﻿using LiveNet.Services.Dtos;
 using LiveNet.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,76 +6,74 @@ using Shared;
 
 namespace LiveNet.Api.Controllers;
 
-[Route("Api/[controller]")]
+[Route( "Api/[controller]" )]
 [ApiController]
-public class ContatoController(IContatoService contato, IUsuarioAtualService usuario) : ControllerBase
+public class ContatoController( IContatoService contato, IUsuarioAtualService usuario ) : ControllerBase
 {
     private readonly IContatoService _service = contato;
     private readonly IUsuarioAtualService _usuarioAtualService = usuario;
 
     [Authorize]
-    [HttpGet("Buscar")]
-    public async Task<ActionResult<IEnumerable<ContatoViewModel>>> GetAsync()
+    [HttpGet( "Buscar" )]
+    public async Task<ActionResult<IEnumerable<ContatoDto>>> GetAsync()
     {
         var usuarioId = _usuarioAtualService.UsuarioId;
-        var contatos = await _service.BuscarContatosAsync(usuarioId);
-        if (!contatos.IsNullOrEmpty())
-            return contatos.Select(c => c.ContatoDtoToVm()).ToList();
+        var contatos = await _service.BuscarContatosAsync( usuarioId );
+        if ( !contatos.IsNullOrEmpty() )
+            return contatos;
         else
             return BadRequest();
     }
 
     [Authorize]
-    [HttpPost("Importar")]
-    public async Task<IActionResult> PostImportAsync(IFormFile file)
+    [HttpPost( "Importar" )]
+    public async Task<IActionResult> PostImportAsync( IFormFile file )
     {
-        if (file == null || file.Length == 0)
-            return BadRequest("Arquivo inválido");
+        if ( file == null || file.Length == 0 )
+            return BadRequest( "Arquivo inválido" );
 
 
-        var ret = await _service.UploadListaAsync(file);
+        var ret = await _service.UploadListaAsync( file );
 
-        return Ok(new
+        return Ok( new
         {
             totalImportados = ret.TotalImportados,
             emailsDuplicados = ret.EmailsDuplicados
-        });
+        } );
 
     }
 
     [Authorize]
-    [HttpPost("Adicionar")]
-    public async Task<IActionResult> PostAsync(ContatoViewModel contato, Guid empresaId)
+    [HttpPost( "Adicionar" )]
+    public async Task<IActionResult> PostAsync( ContatoDto contato, Guid empresaId )
     {
-        if (!ModelState.IsValid)
+        if ( !ModelState.IsValid )
             return BadRequest();
 
-        var model = ContatoMapper.ToContatoModel(contato, empresaId);
-        await _service.CriarContatoManualAsync(model);
+        await _service.CriarContatoManualAsync( contato );
         return Ok();
     }
 
     [Authorize]
-    [HttpPatch("Atualizar")]
-    public async Task<ActionResult> PatchAsync(Guid id, ContatoViewModel contato, Guid empresaId)
+    [HttpPatch( "Atualizar" )]
+    public async Task<ActionResult> PatchAsync( Guid id, ContatoDto contato, Guid empresaId )
     {
-        if (ModelState.IsValid)
+        if ( ModelState.IsValid )
             return BadRequest();
 
-        var model = ContatoMapper.ToContatoModel(contato, empresaId);
-        var retorno = await _service.AtualizarContatoAsync(id, model);
-        if (retorno)
+        var retorno = await _service.AtualizarContatoAsync( id, contato );
+        if ( retorno )
             return Ok();
         else
             return BadRequest();
     }
 
-    [Authorize(Roles = "Admin")]
-    [HttpDelete("Deletar")]
-    public async Task<ActionResult> DeleteAsync(int id)
+    [Authorize( Roles = "Admin" )]
+    [HttpDelete( "Deletar" )]
+    public async Task<ActionResult> DeleteAsync( int id )
     {
-        var retorno = await _service.ExcluirContatoAsync(id);
-        if (retorno)
+        var retorno = await _service.ExcluirContatoAsync( id );
+        if ( retorno )
             return Ok();
         else
             return BadRequest();

@@ -1,33 +1,31 @@
-﻿using LiveNet.Api.Mapping;
-using LiveNet.Api.ViewModels;
+﻿using LiveNet.Services.Dtos;
 using LiveNet.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LiveNet.Api.Controllers;
 
-[Route("Api/[controller]")]
+[Route( "Api/[controller]" )]
 [ApiController]
-public class InteresseController(IInteresseService service) : ControllerBase
+public class InteresseController( IInteresseService service ) : ControllerBase
 {
     private readonly IInteresseService _service = service;
 
     [Authorize]
-    [HttpGet("Buscar")]
-    public async Task<IEnumerable<InteresseViewModel>> GetAsync()
+    [HttpGet( "Buscar" )]
+    public async Task<IEnumerable<InteresseDto>> GetAsync()
     {
         var interesses = await _service.BuscarServicosAsync();
-        return interesses.Select(i => i.ToInteresseVm()).ToList();
+        return interesses;
     }
 
     [Authorize]
-    [HttpPost("Criar")]
-    public async Task<ActionResult> PostAsync(InteresseViewModel interesseViewModel)
+    [HttpPost( "Criar" )]
+    public async Task<ActionResult> PostAsync( InteresseDto interesse )
     {
-        if (ModelState.IsValid)
+        if ( ModelState.IsValid )
         {
-            var model = InteresseMapper.ToInteresseModel(interesseViewModel);
-            await _service.CriarServicosAsync(model);
+            await _service.CriarInteresseAsync( interesse );
             return Ok();
         }
         else
@@ -35,23 +33,22 @@ public class InteresseController(IInteresseService service) : ControllerBase
     }
 
     [Authorize]
-    [HttpPatch("Editar")]
-    public async Task<ActionResult> PatchAsync(InteresseViewModel interesseViewModel, Guid id)
+    [HttpPatch( "Editar" )]
+    public async Task<ActionResult> PatchAsync( InteresseDto interesse, Guid id )
     {
-        if (ModelState.IsValid)
+        if ( ModelState.IsValid )
         {
-            var model = InteresseMapper.ToInteresseModel(interesseViewModel);
-            await _service.AtualizarInteresseAsync(model, id);
+            await _service.AtualizarInteresseAsync( interesse, id );
             return Ok();
         }
         return BadRequest();
     }
 
-    [Authorize(Roles = "Admin")]
-    [HttpDelete("Deletar")]
-    public async Task<ActionResult> DeleteAsync(Guid id)
+    [Authorize( Roles = "Admin" )]
+    [HttpDelete( "Deletar" )]
+    public async Task<ActionResult> DeleteAsync( Guid id )
     {
-        await _service.ExcluirInteresseAsync(id);
+        await _service.ExcluirInteresseAsync( id );
         return Ok();
     }
 }
